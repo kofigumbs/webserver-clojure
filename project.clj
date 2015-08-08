@@ -6,4 +6,5 @@
   :dependencies [[org.clojure/clojure "1.6.0"]]
   :main ^:skip-aot webserver.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:dev {:plugins [[com.jakemccrary/lein-test-refresh "0.10.0"]]}
+             :uberjar {:aot :all}})
