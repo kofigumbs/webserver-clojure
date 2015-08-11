@@ -1,6 +1,6 @@
 (ns webserver.validator)
 
-(defn _no-value-nil? [m]
+(defn- no-value-nil? [m]
   (every? (comp not nil?) (vals m)))
 
 (defn parse-request-line [request-line]
@@ -27,8 +27,8 @@
      :header (parse-header header)
      :body (if (nil? body) "" body)}))
 
-(def valid-request-line? _no-value-nil?)
-(def valid-header? _no-value-nil?)
+(def valid-request-line? no-value-nil?)
+(def valid-header? no-value-nil?)
 
 (defn valid-request? [parsed-request]
   (and

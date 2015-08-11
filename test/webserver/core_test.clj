@@ -4,8 +4,8 @@
 
 (deftest parse-args-test
   (testing "Port option"
-    (is (= "80" (:port (parse-args ["-p" "80"]))))
-    (is (= "8080" (:port (parse-args ["-p" "8080"]))))
+    (is (= 80 (:port (parse-args ["-p" "80"]))))
+    (is (= 8080 (:port (parse-args ["-p" "8080"]))))
     (is (= PORT (:port (parse-args []))))
     )
 
@@ -16,7 +16,7 @@
     )
 
   (testing "Both options"
-    (is (= {:port "80" :dir "/tmp"} (parse-args ["-p" "80" "-d" "/tmp"])))
+    (is (= {:port 80 :dir "/tmp"} (parse-args ["-p" "80" "-d" "/tmp"])))
     (is (= {:port PORT :dir PUBLIC_DIR} (parse-args [])))
     )
   )
