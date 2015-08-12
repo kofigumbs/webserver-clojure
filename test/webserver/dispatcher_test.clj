@@ -6,24 +6,31 @@
 (describe "Set public dir"
   (it "properly sets public string"
     (set-dir "")
-    (should (= @DIR ""))
-    (set-dir "/tmp")
-    (should (= @DIR "/tmp"))
+    (should (= @DIR "/"))
+    (set-dir "tmp")
+    (should (= @DIR "tmp/"))
+    (set-dir "./")
+    (should (= @DIR "./"))
     )
   )
 
 (describe "Get plain text response"
-  (with request "GET /file1 HTTP/1.1\r\n\r\n")
-  (with socket (webserver.mock-socket/make @request))
-  (it "gets file 1"
+  (before
+    (.mkdir (java.io.File. "./tmp"))
+    (spit "./tmp/file" "foobar")
+    (set-dir "./tmp"))
+  (after
+    (.delete (java.io.File. "./tmp/file"))
+    (.delete (java.io.File. "./tmp")))
+  (with socket (webserver.mock-socket/make "GET /file HTTP/1.1\r\n\r\n"))
+  (it "gets mock file"
     (should= (str
                 "HTTP/1.1 200 OK\r\n"
                 "Content-Type: text/plain; charset=utf-8\r\n"
                 "Content-Length: 14\r\n\r\n"
-                "file1 contents\r\n")
+                "foobar")
              (do
                 (dispatch @socket)
                 (str (.getOutputStream @socket))))
     )
   )
-
