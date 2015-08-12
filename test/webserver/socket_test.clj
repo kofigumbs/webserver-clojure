@@ -1,30 +1,23 @@
 (ns webserver.socket-test
   (:require [clojure.test :refer :all]
-            [webserver.socket :refer :all]))
-
-(defn- mock-socket [input]
-  (let [ouput (java.io.ByteArrayOutputStream.)]
-    (proxy [java.net.Socket]
-      []
-      (getInputStream [] (java.io.ByteArrayInputStream. (.getBytes input)))
-      (getOutputStream [] ouput)
-      )))
+            [webserver.socket :refer :all]
+            [webserver.mock-socket]))
 
 (deftest input-stream-mock
   (testing "Basic string"
-    (is (= "foobar" (get-request (mock-socket "foobar"))))
-    (is (= "barfoo" (get-request (mock-socket "barfoo"))))
+    (is (= "foobar" (get-request (webserver.mock-socket/make "foobar"))))
+    (is (= "barfoo" (get-request (webserver.mock-socket/make "barfoo"))))
     )
 
   (testing "Something that looks like a request"
     (def request "GET http://example.com HTTP/1.1\r\n\r\n")
-    (is (= request (get-request (mock-socket request))))
+    (is (= request (get-request (webserver.mock-socket/make request))))
     )
   )
 
 (deftest output-stream-mock
   (testing "Basic string"
-    (def socket (mock-socket ""))
+    (def socket (webserver.mock-socket/make ""))
     (is (=
          "foobar"
          (do (respond socket "foobar")
@@ -33,7 +26,7 @@
 
   (testing "Somthing that looks like a response"
     (def request "GET http://example.com HTTP/1.1\r\n\r\n"))
-    (def socket (mock-socket ""))
+    (def socket (webserver.mock-socket/make ""))
     (def response (str
                     "HTTP/1.1 200 OK\r\n"
                     "Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n"
