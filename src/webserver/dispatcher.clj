@@ -19,9 +19,9 @@
     (reset! DIR (str value "/"))))
 
 (defn dispatch [socket]
-  (let [resposne (-> socket
+  (let [response (-> socket
                      webserver.socket/get-request
                      webserver.validator/parse-request
                      route)]
-    (webserver.socket/respond socket resposne)))
+    (webserver.socket/respond socket response)))
 
