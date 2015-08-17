@@ -14,7 +14,9 @@
   (let [{:keys [port dir]} (parse-args args)
         server (java.net.ServerSocket. port)
         _ (webserver.dispatcher/set-dir dir)]
-    (while
-      true
-      (webserver.dispatcher/dispatch (.accept server)))))
+    (while true
+      (let [socket (.accept server)]
+        (do
+          (webserver.dispatcher/dispatch socket)
+          (.close socket))))))
 

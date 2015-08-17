@@ -22,7 +22,8 @@
   (after
     (.delete (java.io.File. "./tmp/file"))
     (.delete (java.io.File. "./tmp")))
-  (with socket (webserver.mock-socket/make "GET /file HTTP/1.1\r\n\r\n"))
+  (with socket1 (webserver.mock-socket/make "GET /file HTTP/1.1\r\n\r\n"))
+
   (it "gets mock file"
     (should= (str
                 "HTTP/1.1 200 OK\r\n"
@@ -30,8 +31,16 @@
                 "Content-Length: 14\r\n\r\n"
                 "foobar")
              (do
-                (dispatch @socket)
-                (str (.getOutputStream @socket))))
+                (dispatch @socket1)
+                (str (.getOutputStream @socket1))))
+    )
+
+  (with socket2 (webserver.mock-socket/make "GET /none HTTP/1.1\r\n\r\n"))
+  (it "404s on non-existent file"
+    (should= "HTTP/1.1 404 Not Found\r\n"
+             (do
+               (dispatch @socket2)
+               (str (.getOutputStream @socket2))))
     )
   )
 

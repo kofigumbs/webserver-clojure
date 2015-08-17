@@ -7,10 +7,11 @@
 (defmulti route (comp :method :request-line))
 
 (defmethod route "GET" [request]
-  (str "HTTP/1.1 200 OK\r\n"
-       "Content-Type: text/plain; charset=utf-8\r\n"
-       "Content-Length: 14\r\n\r\n"
-       (->> request :request-line :uri (str @DIR) slurp)))
+  (try (str "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/plain; charset=utf-8\r\n"
+            "Content-Length: 14\r\n\r\n"
+            (->> request :request-line :uri (str @DIR) slurp))
+       (catch java.io.FileNotFoundException _ "HTTP/1.1 404 Not Found\r\n")))
 
 (defmethod route :default [request]
   "HTTP/1.1 400 Bad Request\r\n")
