@@ -4,9 +4,8 @@
             [webserver.mock-socket]))
 
 (describe "Input stream mocking"
-  (it "works on basic string"
-    (should= "foobar" (get-request (webserver.mock-socket/make "foobar")))
-    (should= "barfoo" (get-request (webserver.mock-socket/make "barfoo")))
+  (it "returns empty string for invalid request"
+    (should= "" (get-request (webserver.mock-socket/make "foobar")))
     )
 
   (with request "GET http://example.com HTTP/1.1\r\n\r\n")
@@ -16,14 +15,6 @@
   )
 
 (describe "Output stream mocking"
-  (with socket1 (webserver.mock-socket/make ""))
-  (it "works on basic string"
-    (should=
-      "foobar"
-      (do (respond @socket1 "foobar")
-         (.toString (.getOutputStream @socket1))))
-    )
-
   (with response (str
                    "HTTP/1.1 200 OK\r\n"
                    "Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n"
@@ -38,10 +29,10 @@
                    "Hello World! My payload includes a trailing CRLF.\r\n"
                    ))
   (with request "GET http://example.com HTTP/1.1\r\n\r\n")
-  (with socket2 (webserver.mock-socket/make ""))
+  (with socket (webserver.mock-socket/make ""))
   (it "works with something that looks like a response"
     (should=
          @response
-         (do (respond @socket2 @response)
-             (str (.getOutputStream @socket2)))))
+         (do (respond @socket @response)
+             (str (.getOutputStream @socket)))))
   )
