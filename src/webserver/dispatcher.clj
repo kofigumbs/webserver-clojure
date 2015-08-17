@@ -12,6 +12,9 @@
        "Content-Length: 14\r\n\r\n"
        (->> request :request-line :uri (str @DIR) slurp)))
 
+(defmethod route :default [request]
+  (str "HTTP/1.1 400 Bad Request\r\n"))
+
 (defn set-dir [value]
   (if
     (.endsWith value "/")

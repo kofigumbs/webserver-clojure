@@ -13,9 +13,8 @@
 (defn -main [& args]
   (let [{:keys [port dir]} (parse-args args)
         server (java.net.ServerSocket. port)
-        socket (.accept server)
         _ (webserver.dispatcher/set-dir dir)]
     (while
       true
-      (webserver.dispatcher/dispatch socket))))
+      (webserver.dispatcher/dispatch (.accept server)))))
 

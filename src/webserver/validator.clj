@@ -17,7 +17,7 @@
      acc
      (let [regex #"^([\w\-]+): *([^\r\n]+) *$"
            [_ field-name field-value] (first (re-seq regex field))
-           acc (assoc acc (keyword field-name) field-value) ]
+           acc (assoc acc (keyword field-name) field-value)]
        (recur acc more)))))
 
 (defn parse-request [request]

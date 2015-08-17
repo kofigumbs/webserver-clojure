@@ -34,3 +34,13 @@
                 (str (.getOutputStream @socket))))
     )
   )
+
+(describe "Nonsense request"
+  (with socket (webserver.mock-socket/make "foobar"))
+  (it "responds with 400"
+    (should= "HTTP/1.1 400 Bad Request\r\n"
+             (do
+               (dispatch @socket)
+               (str (.getOutputStream @socket))))
+    )
+  )
