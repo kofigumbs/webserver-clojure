@@ -53,8 +53,8 @@
                 "<h2>Directory listing</h2>"
                 "<hr>"
                 "<ul>"
-                "<li><a href=\"file\">file</a>"
-                "<li><a href=\"image.gif\">image.gif</a>"
+                "<li><a href=\"/file\">file</a>"
+                "<li><a href=\"/image.gif\">image.gif</a>"
                 "</ul>"
                 "<hr>"
                 "</body>"
@@ -91,8 +91,7 @@
                             "Content-Type: image/gif\r\n\r\n")
                           )
              (.endsWith (str (.getOutputStream @socket5))
-                        (slurp "./tmp/image.gif"))
-             )))
+                        (slurp "./tmp/image.gif")))))
     )
   )
 

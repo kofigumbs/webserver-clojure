@@ -17,7 +17,7 @@
      "<body>"
      "<h2>Directory listing</h2>"
      "<hr>" "<ul>"]
-    (map #(format "<li><a href=\"%s\">%s</a>" % %) (.list folder))
+    (map #(format "<li><a href=\"/%s\">%s</a>" % %) (.list folder))
     ["</ul>" "<hr>" "</body>" "</html>"]))
 
 (defn- get-request-image [file]
