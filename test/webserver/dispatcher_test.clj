@@ -14,7 +14,7 @@
     )
   )
 
-(describe "Get plain text response"
+(describe "Get existing files"
   (before
     (.mkdir (java.io.File. "./tmp"))
     (spit "./tmp/file" "foobar")
@@ -27,20 +27,40 @@
   (it "gets mock file"
     (should= (str
                 "HTTP/1.1 200 OK\r\n"
-                "Content-Type: text/plain; charset=utf-8\r\n"
-                "Content-Length: 14\r\n\r\n"
+                "Content-Type: application/octet-stream\r\n\r\n"
                 "foobar")
              (do
                 (dispatch @socket1)
                 (str (.getOutputStream @socket1))))
     )
 
-  (with socket2 (webserver.mock-socket/make "GET /none HTTP/1.1\r\n\r\n"))
-  (it "404s on non-existent file"
-    (should= "HTTP/1.1 404 Not Found\r\n"
+  (with socket2 (webserver.mock-socket/make "GET / HTTP/1.1\r\n\r\n"))
+  (it "gets mock folder"
+    (should= (str
+                "HTTP/1.1 200 OK\r\n"
+                "Content-Type: text/html\r\n\r\n"
+                "<!DOCTYPE html><html>"
+                "<title>Directory listing</title>"
+                "<body>"
+                "<h2>Directory listing</h2>"
+                "<hr>"
+                "<ul>"
+                "<li><a href=\"file\">file</a>"
+                "</ul>"
+                "<hr>"
+                "</body>"
+                "</html>")
              (do
                (dispatch @socket2)
                (str (.getOutputStream @socket2))))
+    )
+
+  (with socket3 (webserver.mock-socket/make "GET /none HTTP/1.1\r\n\r\n"))
+  (it "404s on non-existent file"
+    (should= "HTTP/1.1 404 Not Found\r\n"
+             (do
+               (dispatch @socket3)
+               (str (.getOutputStream @socket3))))
     )
   )
 
