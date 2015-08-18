@@ -7,6 +7,7 @@
   :main ^:skip-aot webserver.core
   :target-path "target/%s"
   :profiles {:dev
-             {:dependencies [[speclj "3.3.0"]]}
+             {:dependencies [[speclj "3.3.0"]
+                             [org.clojure/data.codec "0.1.0"]]}
              :uberjar {:aot :all}}
   :plugins [[speclj "3.3.0"]])
