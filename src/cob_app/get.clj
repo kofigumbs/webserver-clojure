@@ -32,6 +32,6 @@
     (re-find IMAGE_EXTENSION (.getName file)) (request-image file)
     :default (request-octet-stream file)))
 
-(defmethod route "GET" [request]
+(defmethod route "GET" [request input-stream]
   (respond (clojure.java.io/file (str @DIR (:uri request)))))
 

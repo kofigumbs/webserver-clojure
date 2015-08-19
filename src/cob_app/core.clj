@@ -10,15 +10,13 @@
 (defn- add-trailing-slash [dir]
   (str dir (if-not (.endsWith dir "/") "/")))
 
-(defmulti route :method)
-
-(defmethod route :default [request] ["HTTP/1.1 200 OK\r\n"])
+(defmulti route (comp :method first list))
 
 (defn initialize [args]
   (reset! DIR (add-trailing-slash (extract-dir args))))
 
 (defn handle [request socket]
-  (let [response (route request)]
-    (doall
-      (map #(clojure.java.io/copy % (.getOutputStream socket)) response))))
+  (let [response (route request (.getInputStream socket))
+        stream (.getOutputStream socket)]
+    (doall (for [r response] (clojure.java.io/copy r stream)))))
 
