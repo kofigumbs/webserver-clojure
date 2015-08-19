@@ -15,7 +15,8 @@
     (should=
       {:method "GET" :uri "http://yahoo.com" :version "HTTP/1.1"}
       (extract-headers
-        (webserver.mock-socket/make "GET http://yahoo.com HTTP/1.1\r\n\r\n"))))
+        (webserver.mock-socket/make "GET http://yahoo.com HTTP/1.1\r\n\r\n")))
+    (should (valid-headers {:method "GET" :uri "/" :version "HTTP/1.1"})))
 
   (it "is short and malformed"
     (should-not
@@ -30,10 +31,8 @@
                   "From: frog@jmarshall.com\r\n"
                   "User-Agent: HTTPTool/1.0\r\n"
                   "Content-Type: application/x-www-form-urlencoded\r\n"
-                  "Content-Length: 32\r\n"
-                  "\r\n"
-                  "home=Cosby&favorite+flavor=flies"
-                  ))
+                  "Content-Length: 32\r\n\r\n"
+                  "home=Cosby&favorite+flavor=flies"))
 
   (it "is long and correct"
     (should=
