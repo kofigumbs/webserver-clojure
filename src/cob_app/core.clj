@@ -10,7 +10,10 @@
 (defn- add-trailing-slash [dir]
   (str dir (if-not (.endsWith dir "/") "/")))
 
-(defmulti route (comp :method first list))
+(defn- method [request & more]
+  (:method request))
+
+(defmulti route method)
 
 (defmethod route :default [request input-stream]
   ["HTTP/1.1 501 Not Implemented\r\n\r\n"])

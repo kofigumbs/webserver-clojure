@@ -2,7 +2,8 @@
   (:require [speclj.core :refer :all]
             [cob-app.get :refer :all]
             [cob-app.core :refer [initialize handle]]
-            [webserver.mock-socket]))
+            [webserver.mock-socket]
+            [clojure.data.codec.base64]))
 
 (describe "GET requests"
   (before-all
