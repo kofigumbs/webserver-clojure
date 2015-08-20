@@ -12,6 +12,9 @@
 
 (defmulti route (comp :method first list))
 
+(defmethod route :default [request input-stream]
+  ["HTTP/1.1 501 Not Implemented\r\n\r\n"])
+
 (defn initialize [args]
   (reset! DIR (add-trailing-slash (extract-dir args))))
 
