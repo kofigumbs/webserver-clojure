@@ -75,3 +75,18 @@
                   (str (.getOutputStream @socket))
                   (slurp "./tmp/image.gif")))))))
 
+(describe "Redirect url"
+  (with socket (webserver.mock-socket/make "/redirect"))
+
+  (it "redirects with 302s to root"
+    (should= (str
+               "HTTP/1.1 302 Found\r\n"
+               "Location: http://localhost:5000/\r\n\r\n")
+             (do
+               (handle
+                 {:method "GET"
+                  :uri "/redirect"
+                  :version "HTTP/1.1"
+                  :Host "localhost:5000"} @socket)
+               (str (.getOutputStream @socket))))))
+
