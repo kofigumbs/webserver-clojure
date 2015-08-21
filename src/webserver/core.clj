@@ -3,6 +3,7 @@
   (:require [cob-app.get])
   (:require [cob-app.add])
   (:require [cob-app.delete])
+  (:require [cob-app.options])
   (:gen-class))
 
 (def DEFAULT_PORT 5000)
