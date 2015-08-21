@@ -15,44 +15,43 @@
   (after-all
     (clojure.java.io/delete-file "./tmp"))
 
-  (with socket (webserver.mock-socket/make
-                 "This is a testing content for the text file foo.bar"))
+  (with-all body "This is a testing content for the text file foo.bar")
 
   (it "stores basic text file (PUT)"
     (should=
       "HTTP/1.1 200 OK\r\n\r\n"
-      (do
-        (handle {:method "PUT"
-                 :uri "/foo.bar"
-                 :version "HTTP/1.1"
-                 :Content-Length "51"
-                 :Content-Type "text/plain"} @socket)
-        (str (.getOutputStream @socket))))
-    (should (.exists (java.io.File. "./tmp/foo.bar")))
-    )
+      (webserver.mock-socket/connect
+        handle
+        {:method "PUT"
+         :uri "/foo.bar"
+         :version "HTTP/1.1"
+         :Content-Length "51"
+         :Content-Type "text/plain"}
+        @body))
+    (should (.exists (java.io.File. "./tmp/foo.bar"))))
 
  (it "stores basic text file (POST)"
     (should=
       "HTTP/1.1 200 OK\r\n\r\n"
-      (do
-        (handle {:method "POST"
-                 :uri "/foo.bar"
-                 :version "HTTP/1.1"
-                 :Content-Length "51"
-                 :Content-Type "text/plain"} @socket)
-        (str (.getOutputStream @socket))))
-    (should (.exists (java.io.File. "./tmp/foo.bar")))
-    )
+      (webserver.mock-socket/connect
+        handle
+        {:method "POST"
+        :uri "/foo.bar"
+        :version "HTTP/1.1"
+        :Content-Length "51"
+        :Content-Type "text/plain"}
+        @body))
+    (should (.exists (java.io.File. "./tmp/foo.bar"))))
 
  (it "Doesn't fail on empty Content-Length and body (POST)"
     (should=
       "HTTP/1.1 200 OK\r\n\r\n"
-      (do
-        (handle {:method "POST"
-                 :uri "/foo.bar"
-                 :version "HTTP/1.1"} @socket)
-        (str (.getOutputStream @socket))))
-    (should (.exists (java.io.File. "./tmp/foo.bar")))
-    )
+      (webserver.mock-socket/connect
+        handle
+        {:method "POST"
+         :uri "/foo.bar"
+         :version "HTTP/1.1"}
+        @body))
+    (should (.exists (java.io.File. "./tmp/foo.bar"))))
   )
 

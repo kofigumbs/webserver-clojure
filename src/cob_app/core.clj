@@ -5,15 +5,15 @@
 (def DIR (atom DEFAULT_DIR))
 
 (defn- extract-dir [args]
-  (#(if (nil? %) DEFAULT_DIR %) (second (drop-while #(not= "-d" %) args))))
+  (#(if % % DEFAULT_DIR) (second (drop-while (partial not= "-d") args))))
 
 (defn- add-trailing-slash [dir]
   (str dir (if-not (.endsWith dir "/") "/")))
 
-(defn- method [request & more]
+(defn- dispatch [request _]
   (:method request))
 
-(defmulti route method)
+(defmulti route dispatch)
 
 (defmethod route :default [request input-stream]
   ["HTTP/1.1 501 Not Implemented\r\n\r\n"])
@@ -23,6 +23,6 @@
 
 (defn handle [request socket]
   (let [response (route request (.getInputStream socket))
-        stream (.getOutputStream socket)]
-    (doall (for [r response] (clojure.java.io/copy r stream)))))
+        input-stream (.getOutputStream socket)]
+    (doall (for [r response] (clojure.java.io/copy r input-stream)))))
 

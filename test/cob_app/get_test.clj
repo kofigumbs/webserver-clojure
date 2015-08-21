@@ -22,71 +22,63 @@
     (.delete (java.io.File. "./tmp/image.gif"))
     (.delete (java.io.File. "./tmp")))
 
-  (with socket (webserver.mock-socket/make ""))
-
   (it "gets mock file"
-    (should= (str
-                "HTTP/1.1 200 OK\r\n"
-                "Content-Type: application/octet-stream\r\n\r\n"
-                "foobar")
-             (do
-                (handle
-                  {:method "GET" :uri "/file" :version "HTTP/1.1"} @socket)
-                (str (.getOutputStream @socket)))))
+    (should=
+      (str
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: application/octet-stream\r\n\r\n"
+        "foobar")
+      (webserver.mock-socket/connect
+        handle
+        {:method "GET" :uri "/file" :version "HTTP/1.1"})))
 
   (it "gets mock folder"
-    (should= (str
-                "HTTP/1.1 200 OK\r\n"
-                "Content-Type: text/html\r\n\r\n"
-                "<!DOCTYPE html><html>"
-                "<body>"
-                "<a href=\"/file\">file</a>"
-                "<a href=\"/image.gif\">image.gif</a>"
-                "</body>"
-                "</html>")
-             (do
-               (handle
-                 {:method "GET" :uri "/" :version "HTTP/1.1"} @socket)
-               (str (.getOutputStream @socket)))))
+    (should=
+      (str
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: text/html\r\n\r\n"
+        "<!DOCTYPE html><html>"
+        "<body>"
+        "<a href=\"/file\">file</a>"
+        "<a href=\"/image.gif\">image.gif</a>"
+        "</body>"
+        "</html>")
+      (webserver.mock-socket/connect
+        handle
+        {:method "GET" :uri "/" :version "HTTP/1.1"})))
 
   (it "404s on non-existent file"
     (should= "HTTP/1.1 404 Not Found\r\n"
-             (do
-               (handle
-                 {:method "GET" :uri "/none" :version "HTTP/1.1"} @socket)
-               (str (.getOutputStream @socket)))))
+             (webserver.mock-socket/connect
+               handle
+               {:method "GET" :uri "/none" :version "HTTP/1.1"})))
 
   (it "404s on non-existent image"
     (should= "HTTP/1.1 404 Not Found\r\n"
-             (do
-               (handle
-                 {:method "GET" :uri "/none.gif" :version "HTTP/1.1"} @socket)
-               (str (.getOutputStream @socket)))))
+             (webserver.mock-socket/connect
+               handle
+               {:method "GET" :uri "/none.gif" :version "HTTP/1.1"})))
 
   (it "responds with image file and headers"
-    (should (do
-              (handle
-                {:method "GET" :uri "/image.gif" :version "HTTP/1.1"} @socket)
-              (and
-                (.startsWith
-                  (str (.getOutputStream @socket))
-                  "HTTP/1.1 200 OK\r\nContent-Type: image/gif\r\n\r\n")
-                (.endsWith
-                  (str (.getOutputStream @socket))
-                  (slurp "./tmp/image.gif")))))))
+    (should=
+      (str
+        "HTTP/1.1 200 OK\r\n"
+        "Content-Type: image/gif\r\n\r\n"
+        (slurp "./tmp/image.gif"))
+      (webserver.mock-socket/connect
+        handle
+        {:method "GET" :uri "/image.gif" :version "HTTP/1.1"}))))
 
 (describe "Redirect url"
-  (with socket (webserver.mock-socket/make "/redirect"))
-
   (it "redirects with 302s to root"
-    (should= (str
-               "HTTP/1.1 302 Found\r\n"
-               "Location: http://localhost:5000/\r\n\r\n")
-             (do
-               (handle
-                 {:method "GET"
-                  :uri "/redirect"
-                  :version "HTTP/1.1"
-                  :Host "localhost:5000"} @socket)
-               (str (.getOutputStream @socket))))))
+    (should=
+      (str
+        "HTTP/1.1 302 Found\r\n"
+        "Location: http://localhost:5000/\r\n\r\n")
+      (webserver.mock-socket/connect
+        handle
+        {:method "GET"
+         :uri "/redirect"
+         :version "HTTP/1.1"
+         :Host "localhost:5000"}))))
 

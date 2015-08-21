@@ -14,10 +14,9 @@
 
 
 (describe "Default response"
-  (with socket (webserver.mock-socket/make ""))
   (it "501s on nonsense request"
     (should=
       "HTTP/1.1 501 Not Implemented\r\n\r\n"
-      (do
-        (handle {:method "FOOBAR" :uri "/" :version "HTTP/1.1"} @socket)
-        (str (.getOutputStream @socket))))))
+      (webserver.mock-socket/connect
+        handle
+        {:method "FOOBAR" :uri "/" :version "HTTP/1.1"}))))

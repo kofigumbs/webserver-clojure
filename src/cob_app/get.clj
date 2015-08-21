@@ -29,7 +29,7 @@
 (defn- request-octet-stream [file]
   ["HTTP/1.1 200 OK\r\n"
    "Content-Type: application/octet-stream\r\n\r\n"
-   (slurp file)])
+   file])
 
 (defn- respond [file request]
   (cond
