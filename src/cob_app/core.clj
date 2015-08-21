@@ -1,7 +1,7 @@
 (ns cob-app.core)
 
 (def DEFAULT_DIR
-  "/Users/hkgumbs/Workspaces/8thLight/webserver-clojure/cob_spec/public/")
+  "/Users/hkgumbs/Workspaces/8thLight/webserver/cob_spec/public/")
 (def DIR (atom DEFAULT_DIR))
 
 (defn- extract-dir [args]
