@@ -1,7 +1,7 @@
 (ns webserver.core
   (:require [cob-app.core :as app])
   (:require [cob-app.get])
-  (:require [cob-app.add])
+  (:require [cob-app.upload])
   (:require [cob-app.delete])
   (:require [cob-app.options])
   (:gen-class))
