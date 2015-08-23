@@ -1,7 +1,7 @@
 (ns cob-app.get-test
   (:require [speclj.core :refer :all]
             [cob-app.get :refer :all]
-            [cob-app.core :refer [initialize handle]]
+            [cob-app.core :refer [handle]]
             [webserver.mock-socket]
             [clojure.data.codec.base64]))
 
@@ -14,8 +14,7 @@
     (clojure.data.codec.base64/encoding-transfer
       (clojure.java.io/input-stream "./tmp/base64_image")
       (clojure.java.io/output-stream "./tmp/image.gif"))
-    (.delete (java.io.File. "./tmp/base64_image"))
-    (initialize ["-d" "./tmp"]))
+    (.delete (java.io.File. "./tmp/base64_image")))
 
   (after-all
     (.delete (java.io.File. "./tmp/file"))

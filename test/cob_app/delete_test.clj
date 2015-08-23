@@ -1,14 +1,13 @@
 (ns cob-app.delete-test
   (:require [speclj.core :refer :all]
             [cob-app.delete :refer :all]
-            [cob-app.core :refer [initialize handle]]
+            [cob-app.core :refer [handle]]
             [webserver.mock-socket]))
 
 (describe "DELETE requests"
   (before-all
     (.mkdir (java.io.File. "./tmp"))
-    (spit "./tmp/file" "foobar")
-    (initialize ["-d" "./tmp"]))
+    (spit "./tmp/file" "foobar"))
 
   (after-all
     (.delete (java.io.File. "./tmp")))

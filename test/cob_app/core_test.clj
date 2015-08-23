@@ -10,8 +10,8 @@
     (initialize ["-d" "tmp"])
     (should= @DIR "tmp/")
     (initialize ["-d" "dir/"])
-    (should= @DIR "dir/")))
-
+    (should= @DIR "dir/")
+    (initialize [])))
 
 (describe "Default response"
   (it "501s on nonsense request"

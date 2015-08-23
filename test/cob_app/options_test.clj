@@ -12,5 +12,5 @@
         "Allow: GET,HEAD,POST,OPTIONS,PUT\r\n\r\n")
       (webserver.mock-socket/connect
         handle
-        {:method "OPTIONS" :uri "/" :version "HTTP/1.1"}))))
+        {:method "OPTIONS" :uri "/method_options" :version "HTTP/1.1"}))))
 

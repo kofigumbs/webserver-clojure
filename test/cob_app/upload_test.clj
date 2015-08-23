@@ -1,13 +1,12 @@
 (ns cob-app.upload-test
   (:require [speclj.core :refer :all]
             [cob-app.upload :refer :all]
-            [cob-app.core :refer [initialize handle]]
+            [cob-app.core :refer [handle]]
             [webserver.mock-socket]))
 
 (describe "Upload request"
   (before-all
-    (.mkdir (java.io.File. "./tmp"))
-    (initialize ["-d" "./tmp"]))
+    (.mkdir (java.io.File. "./tmp")))
 
   (after
     (clojure.java.io/delete-file "./tmp/foo.bar"))
@@ -43,23 +42,23 @@
           @body))
       (should (.exists (java.io.File. "./tmp/foo.bar"))))))
 
-(describe "Upload reqest"
-  (before-all
-    (.mkdir (java.io.File. "./tmp"))
-    (spit "./tmp/file" "foobar")
-    (initialize ["-d" "./tmp"]))
+(describe "POST"
+  (it "405s on /text-file.txt"
+     (should=
+       "HTTP/1.1 405 Method Not Allowed\r\n\r\n"
+       (webserver.mock-socket/connect
+         handle
+         {:method "POST"
+          :uri "/text-file.txt"
+          :version "HTTP/1.1"}))))
 
-  (after-all
-    (clojure.java.io/delete-file "./tmp/file")
-    (clojure.java.io/delete-file "./tmp"))
-
-  (for [method ["PUT" "POST"]]
-    (it (format "405s on files that already exist (%s)" method)
-      (should=
-        "HTTP/1.1 405 Method Not Allowed\r\n\r\n"
-        (webserver.mock-socket/connect
-          handle
-          {:method method
-           :uri "/file"
-           :version "HTTP/1.1"})))))
+(describe "PUT"
+  (it "405s on /file1"
+     (should=
+       "HTTP/1.1 405 Method Not Allowed\r\n\r\n"
+       (webserver.mock-socket/connect
+         handle
+         {:method "PUT"
+          :uri "/file1"
+          :version "HTTP/1.1"}))))
 

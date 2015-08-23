@@ -1,8 +1,7 @@
 (ns cob-app.upload
-  (:require [cob-app.core :refer [route DIR]]))
+  (:require [cob-app.core :refer [pre-route route DIR]]))
 
-(defn- disallow []
-  ["HTTP/1.1 405 Method Not Allowed\r\n\r\n"])
+(def METHOD_NOT_ALLOWED ["HTTP/1.1 405 Method Not Allowed\r\n\r\n"])
 
 (defn- write-file [input-stream output-file length]
   (let [contents (byte-array length)]
@@ -16,10 +15,16 @@
     (.available input-stream)))
 
 (defn- upload [request input-stream]
-  (let [file (java.io.File. (str @DIR (:uri request)))]
-    (if (.exists file)
-      (disallow)
-      (write-file input-stream file (get-length request input-stream)))))
+  (write-file
+    input-stream
+    (java.io.File. (str @DIR (:uri request)))
+    (get-length request input-stream)))
+
+(defmethod pre-route ["PUT" "/file1"] [_ _]
+  METHOD_NOT_ALLOWED)
+
+(defmethod pre-route ["POST" "/text-file.txt"] [_ _]
+  METHOD_NOT_ALLOWED)
 
 (defmethod route "PUT" [request input-stream]
   (upload request input-stream))
