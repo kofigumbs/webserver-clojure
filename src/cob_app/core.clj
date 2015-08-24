@@ -1,4 +1,5 @@
-(ns cob-app.core)
+(ns cob-app.core
+  (:require [webserver.response :as response]))
 
 (def DEFAULT_DIR "./tmp/")
 (def DIR (atom DEFAULT_DIR))
@@ -20,7 +21,7 @@
 (defmulti pre-route dispatch-pre-route)
 
 (defmethod route :default [request input-stream]
-  ["HTTP/1.1 501 Not Implemented\r\n\r\n"])
+  [(response/make 501)])
 
 (defmethod pre-route :default [request input-stream]
   (route request input-stream))

@@ -1,29 +1,31 @@
 (ns cob-app.get
-  (:require [cob-app.core :as core]))
+  (:require [cob-app.core :as core]
+            [webserver.response :as response]))
 
 (def IMAGE_EXTENSION #"\.(jpeg|png|gif)$")
 
 (defn- not-found []
-  ["HTTP/1.1 404 Not Found\r\n"])
+  [(response/make 404)])
+
+(defn- get-image-extension [file]
+  (second (re-find IMAGE_EXTENSION (.getName file))))
 
 (defn- request-image [file]
-  ["HTTP/1.1 200 OK\r\n"
-   (format
-     "Content-Type: image/%s\r\n\r\n"
-     (second (re-find IMAGE_EXTENSION (.getName file))))
+  [(response/make
+     200
+     {:Content-Type
+      (str "image/" (get-image-extension file))})
    file])
 
 (defn- request-directory [folder]
   (concat
-    ["HTTP/1.1 200 OK\r\n"
-     "Content-Type: text/html\r\n\r\n"
+    [(response/make 200 {:Content-Type "text/html"})
      "<!DOCTYPE html><html><body>"]
     (map #(format "<a href=\"/%s\">%s</a>" % %) (.list folder))
     ["</body></html>"]))
 
 (defn- request-octet-stream [file]
-  ["HTTP/1.1 200 OK\r\n"
-   "Content-Type: application/octet-stream\r\n\r\n"
+  [(response/make 200 {:Content-Type "application/octet-stream"})
    file])
 
 (defn- respond [file request]
@@ -34,8 +36,7 @@
     :default (request-octet-stream file)))
 
 (defmethod core/pre-route ["GET" "/redirect"] [{host :Host} _]
-  ["HTTP/1.1 302 Found\r\n"
-   "Location: http://" host "/\r\n\r\n"])
+  [(response/make 302 {:Location (format "http://%s/" host)})])
 
 (defmethod core/route "GET" [request _]
   (respond

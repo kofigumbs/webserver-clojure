@@ -3,6 +3,7 @@
             [cob-app.delete]
             [cob-app.core :as core]
             [webserver.mock-socket :as socket]
+            [webserver.response :as response]
             [clojure.java.io :as io]))
 
 (describe "DELETE requests"
@@ -14,7 +15,7 @@
     (.delete (io/file "./tmp")))
 
   (it "deletes mock file"
-    (should= "HTTP/1.1 200 OK\r\n"
+    (should= (response/make 200)
              (socket/connect
                 core/handle
                 {:method "DELETE" :uri "/file" :version "HTTP/1.1"}))
@@ -22,7 +23,7 @@
 
 
   (it "204s on non-existent file"
-    (should= "HTTP/1.1 204 No Content\r\n"
+    (should= (response/make 204)
              (socket/connect
                core/handle
                {:method "DELETE" :uri "/none" :version "HTTP/1.1"}))))

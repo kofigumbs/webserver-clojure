@@ -1,13 +1,14 @@
 (ns cob-app.upload
-  (:require [cob-app.core :as core]))
+  (:require [cob-app.core :as core]
+            [webserver.response :as response]))
 
-(def METHOD_NOT_ALLOWED ["HTTP/1.1 405 Method Not Allowed\r\n\r\n"])
+(def METHOD_NOT_ALLOWED [(response/make 405)])
 
 (defn- write-file [input-stream output-file length]
   (let [contents (byte-array length)]
     (.read input-stream contents)
     (clojure.java.io/copy contents output-file)
-    ["HTTP/1.1 200 OK\r\n\r\n"]))
+    [(response/make 200)]))
 
 (defn- get-length [{length :Content-Length} input-stream]
   (if length

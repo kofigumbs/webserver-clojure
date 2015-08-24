@@ -1,6 +1,7 @@
 (ns webserver.core-test
   (:require [speclj.core :refer :all]
             [webserver.core :as core]
+            [webserver.response :as response]
             [webserver.mock-socket :as socket]))
 
 (describe "Command line argument"
@@ -51,7 +52,7 @@
   (with socket (socket/make ""))
   (it "writes straight to socket"
     (should=
-      "HTTP/1.1 400 Bad Request\r\n"
+      (response/make 400)
       (do
         (core/respond-400 @socket)
         (str (.getOutputStream @socket))))))

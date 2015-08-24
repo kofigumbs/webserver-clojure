@@ -3,6 +3,7 @@
             [cob-app.upload]
             [cob-app.core :as core]
             [webserver.mock-socket :as socket]
+            [webserver.response :as response]
             [clojure.java.io :as io]))
 
 (describe "Upload request"
@@ -20,7 +21,7 @@
   (for [method ["PUT" "POST"]]
     (it (format "stores basic text file (%s)" method)
       (should=
-        "HTTP/1.1 200 OK\r\n\r\n"
+        (response/make 200)
         (socket/connect
           core/handle
           {:method method
@@ -34,7 +35,7 @@
   (for [method ["PUT" "POST"]]
     (it (format "doesn't fail on empty Content-Length and body (%s)" method)
       (should=
-        "HTTP/1.1 200 OK\r\n\r\n"
+        (response/make 200)
         (socket/connect
           core/handle
           {:method method
@@ -46,7 +47,7 @@
 (describe "POST"
   (it "405s on /text-file.txt"
      (should=
-       "HTTP/1.1 405 Method Not Allowed\r\n\r\n"
+       (response/make 405)
        (socket/connect
          core/handle
          {:method "POST"
@@ -56,7 +57,7 @@
 (describe "PUT"
   (it "405s on /file1"
      (should=
-       "HTTP/1.1 405 Method Not Allowed\r\n\r\n"
+       (response/make 405)
        (socket/connect
          core/handle
          {:method "PUT"

@@ -3,6 +3,7 @@
             [cob-app.get]
             [cob-app.core :as core]
             [webserver.mock-socket :as socket]
+            [webserver.response :as response]
             [clojure.java.io :as io]
             [clojure.data.codec.base64 :as b64]))
 
@@ -25,8 +26,9 @@
   (it "gets mock file"
     (should=
       (str
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: application/octet-stream\r\n\r\n"
+        (response/make
+          200
+          {:Content-Type "application/octet-stream"})
         "foobar")
       (socket/connect
         core/handle
@@ -35,8 +37,9 @@
   (it "gets mock folder"
     (should=
       (str
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: text/html\r\n\r\n"
+        (response/make
+          200
+          {:Content-Type "text/html"})
         "<!DOCTYPE html><html>"
         "<body>"
         "<a href=\"/file\">file</a>"
@@ -48,13 +51,13 @@
         {:method "GET" :uri "/" :version "HTTP/1.1"})))
 
   (it "404s on non-existent file"
-    (should= "HTTP/1.1 404 Not Found\r\n"
+    (should= (response/make 404)
              (socket/connect
                core/handle
                {:method "GET" :uri "/none" :version "HTTP/1.1"})))
 
   (it "404s on non-existent image"
-    (should= "HTTP/1.1 404 Not Found\r\n"
+    (should= (response/make 404)
              (socket/connect
                core/handle
                {:method "GET" :uri "/none.gif" :version "HTTP/1.1"})))
@@ -62,8 +65,7 @@
   (it "responds with image file and headers"
     (should=
       (str
-        "HTTP/1.1 200 OK\r\n"
-        "Content-Type: image/gif\r\n\r\n"
+        (response/make 200 {:Content-Type "image/gif"})
         (slurp "./tmp/image.gif"))
       (socket/connect
         core/handle
@@ -73,8 +75,7 @@
   (it "redirects with 302s to root"
     (should=
       (str
-        "HTTP/1.1 302 Found\r\n"
-        "Location: http://localhost:5000/\r\n\r\n")
+        (response/make 302 {:Location "http://localhost:5000/"}))
       (socket/connect
         core/handle
         {:method "GET"

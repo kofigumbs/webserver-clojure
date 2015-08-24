@@ -1,6 +1,7 @@
 (ns cob-app.core-test
   (:require [speclj.core :refer :all]
             [cob-app.core :as core]
+            [webserver.response :as response]
             [webserver.mock-socket :as socket]))
 
 (describe "Set directory dir"
@@ -16,7 +17,7 @@
 (describe "Default response"
   (it "501s on nonsense request"
     (should=
-      "HTTP/1.1 501 Not Implemented\r\n\r\n"
+      (response/make 501)
       (socket/connect
         core/handle
         {:method "FOOBAR" :uri "/" :version "HTTP/1.1"}))))
