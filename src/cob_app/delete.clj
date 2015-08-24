@@ -1,10 +1,11 @@
 (ns cob-app.delete
-  (:require [cob-app.core :refer [route DIR]]))
+  (:require [cob-app.core :as core]
+            [clojure.java.io :as io]))
 
-(defmethod route "DELETE" [request _]
+(defmethod core/route "DELETE" [request _]
   (if
     (= :failed
-       (clojure.java.io/delete-file (str @DIR (:uri request)) :failed))
+       (io/delete-file (str @core/DIR (:uri request)) :failed))
     ["HTTP/1.1 204 No Content\r\n"]
     ["HTTP/1.1 200 OK\r\n"]))
 

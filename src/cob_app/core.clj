@@ -22,8 +22,8 @@
 (defmethod route :default [request input-stream]
   ["HTTP/1.1 501 Not Implemented\r\n\r\n"])
 
-(defmethod pre-route :default [request socket]
-  (route request socket))
+(defmethod pre-route :default [request input-stream]
+  (route request input-stream))
 
 (defn initialize [args]
   (reset! DIR (add-trailing-slash (extract-dir args))))

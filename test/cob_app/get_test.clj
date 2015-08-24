@@ -1,25 +1,26 @@
 (ns cob-app.get-test
   (:require [speclj.core :refer :all]
-            [cob-app.get :refer :all]
-            [cob-app.core :refer [handle]]
-            [webserver.mock-socket]
-            [clojure.data.codec.base64]))
+            [cob-app.get]
+            [cob-app.core :as core]
+            [webserver.mock-socket :as socket]
+            [clojure.java.io :as io]
+            [clojure.data.codec.base64 :as b64]))
 
 (describe "GET requests"
   (before-all
-    (.mkdir (java.io.File. "./tmp"))
+    (.mkdir (io/file "./tmp"))
     (spit "./tmp/file" "foobar")
     (spit "./tmp/base64_image"
           "R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7")
-    (clojure.data.codec.base64/encoding-transfer
-      (clojure.java.io/input-stream "./tmp/base64_image")
-      (clojure.java.io/output-stream "./tmp/image.gif"))
-    (.delete (java.io.File. "./tmp/base64_image")))
+    (b64/encoding-transfer
+      (io/input-stream "./tmp/base64_image")
+      (io/output-stream "./tmp/image.gif"))
+    (.delete (io/file "./tmp/base64_image")))
 
   (after-all
-    (.delete (java.io.File. "./tmp/file"))
-    (.delete (java.io.File. "./tmp/image.gif"))
-    (.delete (java.io.File. "./tmp")))
+    (.delete (io/file "./tmp/file"))
+    (.delete (io/file "./tmp/image.gif"))
+    (.delete (io/file "./tmp")))
 
   (it "gets mock file"
     (should=
@@ -27,8 +28,8 @@
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: application/octet-stream\r\n\r\n"
         "foobar")
-      (webserver.mock-socket/connect
-        handle
+      (socket/connect
+        core/handle
         {:method "GET" :uri "/file" :version "HTTP/1.1"})))
 
   (it "gets mock folder"
@@ -42,20 +43,20 @@
         "<a href=\"/image.gif\">image.gif</a>"
         "</body>"
         "</html>")
-      (webserver.mock-socket/connect
-        handle
+      (socket/connect
+        core/handle
         {:method "GET" :uri "/" :version "HTTP/1.1"})))
 
   (it "404s on non-existent file"
     (should= "HTTP/1.1 404 Not Found\r\n"
-             (webserver.mock-socket/connect
-               handle
+             (socket/connect
+               core/handle
                {:method "GET" :uri "/none" :version "HTTP/1.1"})))
 
   (it "404s on non-existent image"
     (should= "HTTP/1.1 404 Not Found\r\n"
-             (webserver.mock-socket/connect
-               handle
+             (socket/connect
+               core/handle
                {:method "GET" :uri "/none.gif" :version "HTTP/1.1"})))
 
   (it "responds with image file and headers"
@@ -64,8 +65,8 @@
         "HTTP/1.1 200 OK\r\n"
         "Content-Type: image/gif\r\n\r\n"
         (slurp "./tmp/image.gif"))
-      (webserver.mock-socket/connect
-        handle
+      (socket/connect
+        core/handle
         {:method "GET" :uri "/image.gif" :version "HTTP/1.1"}))))
 
 (describe "Redirect url"
@@ -74,8 +75,8 @@
       (str
         "HTTP/1.1 302 Found\r\n"
         "Location: http://localhost:5000/\r\n\r\n")
-      (webserver.mock-socket/connect
-        handle
+      (socket/connect
+        core/handle
         {:method "GET"
          :uri "/redirect"
          :version "HTTP/1.1"

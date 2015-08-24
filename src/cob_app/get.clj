@@ -1,5 +1,5 @@
 (ns cob-app.get
-  (:require [cob-app.core :refer [pre-route route DIR]]))
+  (:require [cob-app.core :as core]))
 
 (def IMAGE_EXTENSION #"\.(jpeg|png|gif)$")
 
@@ -33,12 +33,12 @@
     (.isDirectory file) (request-directory file)
     :default (request-octet-stream file)))
 
-(defmethod pre-route ["GET" "/redirect"] [{host :Host} _]
+(defmethod core/pre-route ["GET" "/redirect"] [{host :Host} _]
   ["HTTP/1.1 302 Found\r\n"
    "Location: http://" host "/\r\n\r\n"])
 
-(defmethod route "GET" [request _]
+(defmethod core/route "GET" [request _]
   (respond
-    (clojure.java.io/file (str @DIR (:uri request)))
+    (clojure.java.io/file (str @core/DIR (:uri request)))
     request))
 
