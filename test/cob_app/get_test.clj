@@ -74,12 +74,32 @@
 (describe "Redirect url"
   (it "redirects with 302s to root"
     (should=
-      (str
-        (response/make 302 {:Location "http://localhost:5000/"}))
+      (response/make 302 {:Location "http://localhost:5000/"})
       (socket/connect
         core/handle
         {:method "GET"
          :uri "/redirect"
          :version "HTTP/1.1"
          :Host "localhost:5000"}))))
+
+(describe "Parameter url"
+  (it "responds with single decoded parameters"
+    (should=
+      (str (response/make 200) "variable_1 = <,")
+      (socket/connect
+        core/handle
+        {:method "GET"
+         :uri "/parameters"
+         :parameters "variable_1=%3C%2C"
+         :version "HTTP/1.1"})))
+
+  (it "responds with multiple decoded parameters"
+    (should=
+      (str (response/make 200) "x = <,\r\ny = *?\r\nz = hello")
+      (socket/connect
+        core/handle
+        {:method "GET"
+         :uri "/parameters"
+         :parameters "x=%3C%2C&y=%2A%3F&z=hello"
+         :version "HTTP/1.1"}))))
 

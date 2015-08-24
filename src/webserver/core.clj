@@ -25,13 +25,21 @@
   (let [[field-name field-value] (.split field ":" 2)]
     (assoc acc (keyword field-name) (.trim field-value))))
 
+(defn- add-parameters [{uri :uri :as request}]
+  (if
+    (and uri (.contains uri "?"))
+    (let [[domain parameters] (.split uri "\\?" 2)]
+      (-> request (assoc :uri domain) (assoc :parameters parameters)))
+    request))
+
 (defn- map-headers [headers]
   (let [[request-line header-fields] (.split headers "\r\n" 2)
         [_ method uri version] (re-find REQUEST_LINE_REGEX request-line)]
-    (reduce
-      accumulate-header-fields
-      {:method method :uri uri :version version}
-      (.split header-fields "\r\n"))))
+    (add-parameters
+      (reduce
+        accumulate-header-fields
+        {:method method :uri uri :version version}
+        (.split header-fields "\r\n")))))
 
 (defn respond-400 [socket]
   (clojure.java.io/copy
