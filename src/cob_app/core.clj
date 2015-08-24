@@ -3,9 +3,13 @@
 
 (def DEFAULT_DIR "./tmp/")
 (def DIR (atom DEFAULT_DIR))
+(def LOG (atom []))
 
 (defn- extract-dir [args]
   (#(if % % DEFAULT_DIR) (second (drop-while (partial not= "-d") args))))
+
+(defn- update-log [{method :method uri :uri version :version}]
+  (swap! LOG conj (format "%s %s %s\r\n" method uri version)))
 
 (defn- add-trailing-slash [dir]
   (str dir (if-not (.endsWith dir "/") "/")))
@@ -30,7 +34,8 @@
   (reset! DIR (add-trailing-slash (extract-dir args))))
 
 (defn handle [request socket]
-  (let [response (pre-route request (.getInputStream socket))
+  (let [_ (update-log request)
+        response (pre-route request (.getInputStream socket))
         output-stream (.getOutputStream socket)]
     (doall (for [r response] (clojure.java.io/copy r output-stream)))))
 

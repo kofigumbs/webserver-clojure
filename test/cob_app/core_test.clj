@@ -21,3 +21,18 @@
       (socket/connect
         core/handle
         {:method "FOOBAR" :uri "/" :version "HTTP/1.1"}))))
+
+(describe "Log"
+  (before
+    (reset! core/LOG []))
+
+  (it "should update with every request"
+    (should= [] @core/LOG)
+    (should=
+      ["FOOBAR / HTTP/1.1\r\n"]
+      (do
+        (socket/connect
+          core/handle
+          {:method "FOOBAR" :uri "/" :version "HTTP/1.1"})
+        @core/LOG))))
+

@@ -1,8 +1,11 @@
 (ns cob-app.get
   (:require [cob-app.core :as core]
-            [webserver.response :as response]))
+            [webserver.response :as response]
+            [clojure.data.codec.base64 :as b64]))
 
 (def IMAGE_EXTENSION #"\.(jpeg|png|gif)$")
+(def AUTHORIZATION
+  (str "Basic " (String. (b64/encode (.getBytes "admin:hunter2")))))
 
 (defn- not-found []
   [(response/make 404)])
@@ -45,6 +48,11 @@
            (.replaceAll "=" " = ")
            (.replaceAll "&" "\r\n")
            (java.net.URLDecoder/decode "UTF-8")))])
+
+(defmethod core/pre-route ["GET" "/logs"] [{token :Authorization} _]
+  (if (= token AUTHORIZATION)
+    (cons (response/make 200) @core/LOG)
+    [(response/make 401) "Authentication required"]))
 
 (defmethod core/route "GET" [request _]
   (respond

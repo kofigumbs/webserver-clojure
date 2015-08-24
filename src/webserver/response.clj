@@ -7,6 +7,7 @@
    204 "No Content"
    302 "Found"
    400 "Bad Request"
+   401 "Authorization Required"
    404 "Not Found"
    405 "Method Not Allowed"
    501 "Not Implemented"})
