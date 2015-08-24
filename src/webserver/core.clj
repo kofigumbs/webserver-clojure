@@ -61,12 +61,18 @@
 (defn valid-headers [request-map]
   (not-any? nil? (vals request-map)))
 
+(defn dispatch [socket]
+  (let [headers (extract-headers socket)]
+    (if (valid-headers headers)
+      (app/handle headers socket)
+      (respond-400 socket))
+    (.close socket)))
+
 (defn -main [& args]
   (let [server (java.net.ServerSocket. (extract-port args))
+        pool (java.util.concurrent.Executors/newSingleThreadExecutor)
         _ (app/initialize args)
         _ (println "Serving HTTP...")]
-    (while true (with-open [socket (.accept server)]
-                  (#(if (valid-headers %)
-                      (app/handle % socket)
-                      (respond-400 socket)) (extract-headers socket))))))
+    (while true (let [socket (.accept server)]
+                  (.submit pool (cast Runnable #(dispatch socket)))))))
 
