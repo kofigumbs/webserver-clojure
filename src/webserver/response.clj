@@ -2,15 +2,14 @@
 
 (def VERSION "HTTP/1.1")
 (def NEW_LINE "\r\n")
-(def NAMES {
-            200 "OK"
-            204 "No Content"
-            302 "Found"
-            400 "Bad Request"
-            404 "Not Found"
-            405 "Method Not Allowed"
-            501 "Not Implemented"
-            })
+(def NAMES
+  {200 "OK"
+   204 "No Content"
+   302 "Found"
+   400 "Bad Request"
+   404 "Not Found"
+   405 "Method Not Allowed"
+   501 "Not Implemented"})
 
 (defn- make-response-line [code]
   (if (contains? NAMES code)
