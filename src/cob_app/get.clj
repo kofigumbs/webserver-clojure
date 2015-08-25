@@ -38,6 +38,14 @@
 (defmethod core/pre-route ["GET" "/redirect"] [{host :Host} _]
   [(response/make 302 {:Location (format "http://%s/" host)})])
 
+(defmethod core/pre-route ["GET" "/parameters"] [{parameters :parameters} _]
+  [(response/make 200)
+   (if parameters
+       (-> parameters
+           (.replaceAll "=" " = ")
+           (.replaceAll "&" "\r\n")
+           (java.net.URLDecoder/decode "UTF-8")))])
+
 (defmethod core/route "GET" [request _]
   (respond
     (clojure.java.io/file (str @core/DIR (:uri request)))

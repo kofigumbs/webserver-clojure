@@ -46,7 +46,16 @@
        :User-Agent "HTTPTool/1.0"
        :Content-Type "application/x-www-form-urlencoded"
        :Content-Length "32"}
-      (core/extract-headers (socket/make @request)))))
+      (core/extract-headers (socket/make @request))))
+
+  (it "treats GET parameters as map key"
+    (should=
+      {:method "GET"
+       :uri "localhost:8000"
+       :version "HTTP/1.1"
+       :parameters "%3C%2C"}
+      (core/extract-headers
+        (socket/make "GET localhost:8000?%3C%2C HTTP/1.1\r\n\r\n")))))
 
 (describe "400 response"
   (with socket (socket/make ""))
