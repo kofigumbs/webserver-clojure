@@ -1,29 +1,30 @@
 (ns cob-app.delete-test
   (:require [speclj.core :refer :all]
-            [cob-app.delete :refer :all]
-            [cob-app.core :refer [initialize handle]]
-            [webserver.mock-socket]))
+            [cob-app.delete]
+            [cob-app.core :as core]
+            [webserver.mock-socket :as socket]
+            [webserver.response :as response]
+            [clojure.java.io :as io]))
 
 (describe "DELETE requests"
   (before-all
-    (.mkdir (java.io.File. "./tmp"))
-    (spit "./tmp/file" "foobar")
-    (initialize ["-d" "./tmp"]))
+    (.mkdir (io/file "./tmp"))
+    (spit "./tmp/file" "foobar"))
 
   (after-all
-    (.delete (java.io.File. "./tmp")))
+    (.delete (io/file "./tmp")))
 
   (it "deletes mock file"
-    (should= "HTTP/1.1 200 OK\r\n"
-             (webserver.mock-socket/connect
-                handle
+    (should= (response/make 200)
+             (socket/connect
+                core/handle
                 {:method "DELETE" :uri "/file" :version "HTTP/1.1"}))
-    (should-not (.exists (java.io.File. "./tmp/file"))))
+    (should-not (.exists (io/file "./tmp/file"))))
 
 
   (it "204s on non-existent file"
-    (should= "HTTP/1.1 204 No Content\r\n"
-             (webserver.mock-socket/connect
-               handle
+    (should= (response/make 204)
+             (socket/connect
+               core/handle
                {:method "DELETE" :uri "/none" :version "HTTP/1.1"}))))
 

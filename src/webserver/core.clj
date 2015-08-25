@@ -1,7 +1,8 @@
 (ns webserver.core
+  (:require [webserver.response :as response])
   (:require [cob-app.core :as app])
   (:require [cob-app.get])
-  (:require [cob-app.add])
+  (:require [cob-app.upload])
   (:require [cob-app.delete])
   (:require [cob-app.options])
   (:gen-class))
@@ -34,7 +35,7 @@
 
 (defn respond-400 [socket]
   (clojure.java.io/copy
-    "HTTP/1.1 400 Bad Request\r\n"
+    (response/make 400)
     (.getOutputStream socket)))
 
 (defn extract-headers [socket]

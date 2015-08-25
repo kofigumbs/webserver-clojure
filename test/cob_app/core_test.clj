@@ -1,22 +1,23 @@
 (ns cob-app.core-test
   (:require [speclj.core :refer :all]
-            [cob-app.core :refer :all]
-            [webserver.mock-socket]))
+            [cob-app.core :as core]
+            [webserver.response :as response]
+            [webserver.mock-socket :as socket]))
 
 (describe "Set directory dir"
   (it "properly sets public string"
-    (initialize [])
-    (should= @DIR DEFAULT_DIR)
-    (initialize ["-d" "tmp"])
-    (should= @DIR "tmp/")
-    (initialize ["-d" "dir/"])
-    (should= @DIR "dir/")))
-
+    (core/initialize [])
+    (should= @core/DIR core/DEFAULT_DIR)
+    (core/initialize ["-d" "tmp"])
+    (should= @core/DIR "tmp/")
+    (core/initialize ["-d" "dir/"])
+    (should= @core/DIR "dir/")
+    (core/initialize [])))
 
 (describe "Default response"
   (it "501s on nonsense request"
     (should=
-      "HTTP/1.1 501 Not Implemented\r\n\r\n"
-      (webserver.mock-socket/connect
-        handle
+      (response/make 501)
+      (socket/connect
+        core/handle
         {:method "FOOBAR" :uri "/" :version "HTTP/1.1"}))))
