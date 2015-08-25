@@ -103,3 +103,26 @@
          :parameters "x=%3C%2C&y=%2A%3F&z=hello"
          :version "HTTP/1.1"}))))
 
+(describe "Logs url"
+  (before
+    (reset! core/LOG []))
+
+  (it "should reject without authorization"
+    (should=
+      (str (response/make 401) "Authentication required")
+      (socket/connect
+        core/handle
+        {:method "GET"
+         :uri "/logs"
+         :version "HTTP/1.1"})))
+
+  (it "should contain the logs otherwise"
+    (should=
+      (str (response/make 200) "GET /logs HTTP/1.1\r\n")
+      (socket/connect
+        core/handle
+        {:method "GET"
+         :uri "/logs"
+         :version "HTTP/1.1"
+         :Authorization cob-app.get/AUTHORIZATION}))))
+
