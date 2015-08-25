@@ -10,6 +10,8 @@
    401 "Authorization Required"
    404 "Not Found"
    405 "Method Not Allowed"
+   409 "Conflict"
+   412 "Precondition Failed"
    501 "Not Implemented"})
 
 (defn- make-response-line [code]
