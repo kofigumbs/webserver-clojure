@@ -1,5 +1,6 @@
 (ns cob-app.core
-  (:require [webserver.response :as response]))
+  (:require [webserver.response :as response]
+            [webserver.app :as app]))
 
 (def DEFAULT_DIR "./tmp/")
 (def DIR (atom DEFAULT_DIR))
@@ -30,10 +31,10 @@
 (defmethod pre-route :default [request input-stream]
   (route request input-stream))
 
-(defn initialize [args]
+(defmethod app/initialize true [args]
   (reset! DIR (add-trailing-slash (extract-dir args))))
 
-(defn handle [request socket]
+(defmethod app/handle true [socket request]
   (let [_ (update-log request)
         response (pre-route request (.getInputStream socket))
         output-stream (.getOutputStream socket)]

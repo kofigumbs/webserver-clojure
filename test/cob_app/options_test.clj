@@ -10,6 +10,5 @@
     (should=
       (response/make 200 {:Allow "GET,HEAD,POST,OPTIONS,PUT"})
       (socket/connect
-        core/handle
         {:method "OPTIONS" :uri "/method_options" :version "HTTP/1.1"}))))
 

@@ -31,7 +31,6 @@
           {:Content-Type "application/octet-stream"})
         "foobar")
       (socket/connect
-        core/handle
         {:method "GET" :uri "/file" :version "HTTP/1.1"})))
 
   (it "gets mock folder"
@@ -47,19 +46,16 @@
         "</body>"
         "</html>")
       (socket/connect
-        core/handle
         {:method "GET" :uri "/" :version "HTTP/1.1"})))
 
   (it "404s on non-existent file"
     (should= (response/make 404)
              (socket/connect
-               core/handle
                {:method "GET" :uri "/none" :version "HTTP/1.1"})))
 
   (it "404s on non-existent image"
     (should= (response/make 404)
              (socket/connect
-               core/handle
                {:method "GET" :uri "/none.gif" :version "HTTP/1.1"})))
 
   (it "responds with image file and headers"
@@ -68,7 +64,6 @@
         (response/make 200 {:Content-Type "image/gif"})
         (slurp "./tmp/image.gif"))
       (socket/connect
-        core/handle
         {:method "GET" :uri "/image.gif" :version "HTTP/1.1"}))))
 
 (describe "Redirect url"
@@ -76,7 +71,6 @@
     (should=
       (response/make 302 {:Location "http://localhost:5000/"})
       (socket/connect
-        core/handle
         {:method "GET"
          :uri "/redirect"
          :version "HTTP/1.1"
@@ -87,7 +81,6 @@
     (should=
       (str (response/make 200) "variable_1 = <,")
       (socket/connect
-        core/handle
         {:method "GET"
          :uri "/parameters"
          :parameters "variable_1=%3C%2C"
@@ -97,7 +90,6 @@
     (should=
       (str (response/make 200) "x = <,\r\ny = *?\r\nz = hello")
       (socket/connect
-        core/handle
         {:method "GET"
          :uri "/parameters"
          :parameters "x=%3C%2C&y=%2A%3F&z=hello"

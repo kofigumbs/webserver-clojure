@@ -17,7 +17,6 @@
   (it "deletes mock file"
     (should= (response/make 200)
              (socket/connect
-                core/handle
                 {:method "DELETE" :uri "/file" :version "HTTP/1.1"}))
     (should-not (.exists (io/file "./tmp/file"))))
 
@@ -25,6 +24,5 @@
   (it "204s on non-existent file"
     (should= (response/make 204)
              (socket/connect
-               core/handle
                {:method "DELETE" :uri "/none" :version "HTTP/1.1"}))))
 
