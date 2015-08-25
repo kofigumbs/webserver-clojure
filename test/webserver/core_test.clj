@@ -63,6 +63,6 @@
     (should=
       (response/make 400)
       (do
-        (core/respond-400 @socket)
+        (core/relay @socket)
         (str (.getOutputStream @socket))))))
 

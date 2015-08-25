@@ -41,7 +41,7 @@
         {:method method :uri uri :version version}
         (.split header-fields "\r\n")))))
 
-(defn respond-400 [socket]
+(defn- respond-400 [socket]
   (clojure.java.io/copy
     (response/make 400)
     (.getOutputStream socket)))
@@ -61,7 +61,7 @@
 (defn valid-headers [request-map]
   (not-any? nil? (vals request-map)))
 
-(defn dispatch [socket]
+(defn relay [socket]
   (let [headers (extract-headers socket)]
     (if (valid-headers headers)
       (app/handle headers socket)
@@ -74,5 +74,5 @@
         _ (app/initialize args)
         _ (println "Serving HTTP...")]
     (while true (let [socket (.accept server)]
-                  (.submit pool (cast Runnable #(dispatch socket)))))))
+                  (.submit pool (cast Runnable #(relay socket)))))))
 
