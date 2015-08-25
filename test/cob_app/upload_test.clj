@@ -36,14 +36,7 @@
       (should=
         (response/make 200)
         (socket/connect
-<<<<<<< 4a9cd3b59d4e3bdfe5256fc8f6dc5feb4859ab13
-          core/handle
           {:method method :uri "/foo.bar" :version "HTTP/1.1"}
-=======
-          {:method method
-           :uri "/foo.bar"
-           :version "HTTP/1.1"}
->>>>>>> Extracted socket dispatching from webserver.core
           @body))
       (should (.exists (java.io.File. "./tmp/foo.bar"))))))
 
@@ -52,22 +45,13 @@
      (should=
        (response/make 405)
        (socket/connect
-<<<<<<< 4a9cd3b59d4e3bdfe5256fc8f6dc5feb4859ab13
-         core/handle
          {:method "POST" :uri "/text-file.txt" :version "HTTP/1.1"}))))
-=======
-         {:method "POST"
-          :uri "/text-file.txt"
-          :version "HTTP/1.1"}))))
->>>>>>> Extracted socket dispatching from webserver.core
 
 (describe "PUT"
   (it "405s on /file1"
      (should=
        (response/make 405)
        (socket/connect
-<<<<<<< 4a9cd3b59d4e3bdfe5256fc8f6dc5feb4859ab13
-         core/handle
          {:method "PUT" :uri "/file1" :version "HTTP/1.1"}))))
 
 (describe "PATCH request"
@@ -79,14 +63,12 @@
     (should=
       (response/make 409)
       (socket/connect
-        core/handle
         {:method "PATCH" :uri "/foo.bar" :version "HTTP/1.1"})))
 
   (it "412s with wrong ETag"
     (should=
       (response/make 412)
       (socket/connect
-        core/handle
         {:method "PATCH"
          :uri "/foo.bar"
          :version "HTTP/1.1"
@@ -96,7 +78,6 @@
     (should=
       (response/make 204)
       (socket/connect
-        core/handle
         {:method "PATCH"
          :uri "/foo.bar"
          :version "HTTP/1.1"
@@ -107,9 +88,4 @@
   (after-all
     (io/delete-file "./tmp/foo.bar")
     (io/delete-file "./tmp")))
-=======
-         {:method "PUT"
-          :uri "/file1"
-          :version "HTTP/1.1"}))))
->>>>>>> Extracted socket dispatching from webserver.core
 

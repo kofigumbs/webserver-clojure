@@ -103,7 +103,6 @@
     (should=
       (str (response/make 401) "Authentication required")
       (socket/connect
-        core/handle
         {:method "GET"
          :uri "/logs"
          :version "HTTP/1.1"})))
@@ -112,7 +111,6 @@
     (should=
       (str (response/make 200) "GET /logs HTTP/1.1\r\n")
       (socket/connect
-        core/handle
         {:method "GET"
          :uri "/logs"
          :version "HTTP/1.1"

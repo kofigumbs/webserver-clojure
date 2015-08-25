@@ -15,24 +15,29 @@
 (defn- add-trailing-slash [dir]
   (str dir (if-not (.endsWith dir "/") "/")))
 
+(defmethod app/initialize true [args]
+  (reset! DIR (add-trailing-slash (extract-dir args))))
+
+(defn- add-trailing-slash [dir]
+  (str dir (if-not (.endsWith dir "/") "/")))
+
+
 (defn- dispatch-route [request _]
   (:method request))
 
-(defn- dispatch-pre-route [request _]
-  [(:method request) (:uri request)])
-
 (defmulti route dispatch-route)
-
-(defmulti pre-route dispatch-pre-route)
 
 (defmethod route :default [request input-stream]
   [(response/make 501)])
 
+
+(defn- dispatch-pre-route [request _]
+  [(:method request) (:uri request)])
+
+(defmulti pre-route dispatch-pre-route)
+
 (defmethod pre-route :default [request input-stream]
   (route request input-stream))
-
-(defmethod app/initialize true [args]
-  (reset! DIR (add-trailing-slash (extract-dir args))))
 
 (defmethod app/handle true [socket request]
   (let [_ (update-log request)

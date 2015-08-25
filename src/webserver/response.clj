@@ -12,6 +12,7 @@
    405 "Method Not Allowed"
    409 "Conflict"
    412 "Precondition Failed"
+   500 "Internal Server Error"
    501 "Not Implemented"})
 
 (defn- make-response-line [code]

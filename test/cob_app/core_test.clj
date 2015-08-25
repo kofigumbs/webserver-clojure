@@ -32,7 +32,6 @@
       ["FOOBAR / HTTP/1.1\r\n"]
       (do
         (socket/connect
-          core/handle
           {:method "FOOBAR" :uri "/" :version "HTTP/1.1"})
         @core/LOG))))
 

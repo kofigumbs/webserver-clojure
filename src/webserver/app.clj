@@ -7,14 +7,15 @@
 (defn- dispatch-handle [_ request]
   (headers/valid? request))
 
-(defmulti initialize coll?)
+(defn- respond [code socket]
+  (io/copy (response/make code) (.getOutputStream socket)))
 
 (defmulti handle dispatch-handle)
+(defmethod handle false [socket _] (respond 400 socket))
+(defmethod handle :default [socket _] (respond 500 socket))
 
+(defmulti initialize coll?)
 (defmethod initialize :default [& _])
-
-(defmethod handle :default [socket _]
-  (io/copy (response/make 400) (.getOutputStream socket)))
 
 (defn relay [socket]
   (handle socket (headers/extract socket))
