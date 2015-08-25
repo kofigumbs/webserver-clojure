@@ -38,9 +38,7 @@
         (response/make 200)
         (socket/connect
           core/handle
-          {:method method
-           :uri "/foo.bar"
-           :version "HTTP/1.1"}
+          {:method method :uri "/foo.bar" :version "HTTP/1.1"}
           @body))
       (should (.exists (java.io.File. "./tmp/foo.bar"))))))
 
@@ -50,9 +48,7 @@
        (response/make 405)
        (socket/connect
          core/handle
-         {:method "POST"
-          :uri "/text-file.txt"
-          :version "HTTP/1.1"}))))
+         {:method "POST" :uri "/text-file.txt" :version "HTTP/1.1"}))))
 
 (describe "PUT"
   (it "405s on /file1"
@@ -60,7 +56,43 @@
        (response/make 405)
        (socket/connect
          core/handle
-         {:method "PUT"
-          :uri "/file1"
-          :version "HTTP/1.1"}))))
+         {:method "PUT" :uri "/file1" :version "HTTP/1.1"}))))
+
+(describe "PATCH request"
+  (before-all
+    (.mkdir (io/file "./tmp"))
+    (spit "./tmp/foo.bar" "foobar"))
+
+  (it "409s without ETag"
+    (should=
+      (response/make 409)
+      (socket/connect
+        core/handle
+        {:method "PATCH" :uri "/foo.bar" :version "HTTP/1.1"})))
+
+  (it "412s with wrong ETag"
+    (should=
+      (response/make 412)
+      (socket/connect
+        core/handle
+        {:method "PATCH"
+         :uri "/foo.bar"
+         :version "HTTP/1.1"
+         :If-Match "123456789abcdefghijklm"})))
+
+  (it "204s and updates with proper ETag"
+    (should=
+      (response/make 204)
+      (socket/connect
+        core/handle
+        {:method "PATCH"
+         :uri "/foo.bar"
+         :version "HTTP/1.1"
+         :If-Match "8843d7f92416211de9ebb963ff4ce28125932878"}
+        "barfoo"))
+    (should= (slurp "./tmp/foo.bar") "barfoo"))
+
+  (after-all
+    (io/delete-file "./tmp/foo.bar")
+    (io/delete-file "./tmp")))
 
