@@ -9,10 +9,10 @@
       (getOutputStream [] ouput-stream))))
 
 (defn connect
-  ([request]
-   (connect request ""))
-  ([request body]
+  ([handler request]
+   (connect handler request ""))
+  ([handler request body]
    (let [socket (make body)]
-     (app/handle socket request)
+     (handler socket request)
      (str (.getOutputStream socket)))))
 

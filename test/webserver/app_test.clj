@@ -5,25 +5,27 @@
             [webserver.headers :as headers]
             [webserver.mock-socket :as socket]))
 
-(describe "Relay (with no app hooked up)"
-  (with socket (socket/make ""))
-  (it "writes 400 response straight to socket"
+(defn- stub-handler [socket _]
+  (spit (.getOutputStream socket) "Hello world!"))
+
+(describe "Relay"
+  (it "writes 400 on malformed request"
     (should=
       (response/make 400)
-      (do
-        (app/relay @socket)
-        (str (.getOutputStream @socket))))))
+      (let [socket (socket/make "")]
+        (app/relay socket)
+        (str (.getOutputStream socket)))))
+
+  (it "uses handler for correctly formed request"
+    (should=
+      "Hello world!"
+      (let [socket (socket/make "HEAD / HTTP/1.1\r\n\r\n")]
+        (app/initialize
+          {:initializer (fn [_]) :valid-request-handler stub-handler} [])
+        (app/relay socket)
+        (str (.getOutputStream socket))))))
 
 (describe "Initialize (with no app hooked up)"
   (it "doesn't fail"
-    (should-not-throw (app/initialize nil))))
-
-(describe "Handle (with no app hooked up)"
-  (it "500s on valid request"
-    (should=
-      (response/make 500)
-      (with-redefs [headers/valid? (fn[_] :default)]
-        ;; this redef keeps require's from other namespaces from
-        ;; interfering when running entire test suite
-        (socket/connect {:method "GET" :uri "/" :version "HTTP/1.1"})))))
+    (should= 2 (app/initialize {:initializer inc} 1))))
 

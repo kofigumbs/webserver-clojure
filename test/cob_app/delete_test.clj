@@ -1,8 +1,7 @@
 (ns cob-app.delete-test
   (:require [speclj.core :refer :all]
             [cob-app.delete]
-            [cob-app.core :as core]
-            [webserver.mock-socket :as socket]
+            [cob-app.mock-socket :as socket]
             [webserver.response :as response]
             [clojure.java.io :as io]))
 

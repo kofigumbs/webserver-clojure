@@ -2,7 +2,7 @@
   (:require [speclj.core :refer :all]
             [cob-app.get]
             [cob-app.core :as core]
-            [webserver.mock-socket :as socket]
+            [cob-app.mock-socket :as socket]
             [webserver.response :as response]
             [clojure.java.io :as io]
             [clojure.data.codec.base64 :as b64]))

@@ -1,8 +1,7 @@
 (ns cob-app.options-test
   (:require [speclj.core :refer :all]
             [cob-app.options]
-            [cob-app.core :as core]
-            [webserver.mock-socket :as socket]
+            [cob-app.mock-socket :as socket]
             [webserver.response :as response]))
 
 (describe "OPTIONS request"

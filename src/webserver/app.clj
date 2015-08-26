@@ -1,23 +1,24 @@
 (ns webserver.app
-  (:require [webserver.response :as response])
-  (:require [webserver.headers :as headers])
-  (:require [clojure.java.io :as io])
-  (:gen-class))
+  (:require [webserver.response :as response]
+            [webserver.headers :as headers]
+            [clojure.java.io :as io]))
 
-(defn- dispatch-handle [_ request]
-  (headers/valid? request))
+(def protocol (atom {}))
 
-(defn- respond [code socket]
-  (io/copy (response/make code) (.getOutputStream socket)))
+(defn initialize [backing-protocol args]
+  (reset! protocol backing-protocol)
+  ((:initializer @protocol) args))
 
-(defmulti handle dispatch-handle)
-(defmethod handle false [socket _] (respond 400 socket))
-(defmethod handle :default [socket _] (respond 500 socket))
 
-(defmulti initialize coll?)
-(defmethod initialize :default [& _])
+(defn- write-400 [socket]
+  (io/copy (response/make 400) (.getOutputStream socket)))
+
+(defn- respond [handler request socket]
+  (if (headers/valid? request)
+    (handler socket request)
+    (write-400 socket)))
 
 (defn relay [socket]
-  (handle socket (headers/extract socket))
+  (respond (:valid-request-handler @protocol) (headers/extract socket) socket)
   (.close socket))
 

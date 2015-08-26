@@ -3,17 +3,17 @@
             [cob-app.core :as core]
             [webserver.app :as app]
             [webserver.response :as response]
-            [webserver.mock-socket :as socket]))
+            [cob-app.mock-socket :as socket]))
 
 (describe "Set directory dir"
   (it "properly sets public string"
-    (app/initialize [])
+    (app/initialize core/protocol [])
     (should= @core/DIR core/DEFAULT_DIR)
-    (app/initialize ["-d" "tmp"])
+    (app/initialize core/protocol ["-d" "tmp"])
     (should= @core/DIR "tmp/")
-    (app/initialize ["-d" "dir/"])
+    (app/initialize core/protocol ["-d" "dir/"])
     (should= @core/DIR "dir/")
-    (app/initialize [])))
+    (app/initialize core/protocol [])))
 
 (describe "Default response"
   (it "501s on nonsense request"
