@@ -71,9 +71,7 @@
     (should=
       (response/make 302 {:Location "http://localhost:5000/"})
       (socket/connect
-        {:method "GET"
-         :uri "/redirect"
-         :version "HTTP/1.1"
+        {:method "GET" :uri "/redirect" :version "HTTP/1.1"
          :Host "localhost:5000"}))))
 
 (describe "Parameter url"
@@ -90,10 +88,8 @@
     (should=
       (str (response/make 200) "x = <,\r\ny = *?\r\nz = hello")
       (socket/connect
-        {:method "GET"
-         :uri "/parameters"
-         :parameters "x=%3C%2C&y=%2A%3F&z=hello"
-         :version "HTTP/1.1"}))))
+        {:method "GET" :uri "/parameters" :version "HTTP/1.1"
+         :parameters "x=%3C%2C&y=%2A%3F&z=hello"}))))
 
 (describe "Logs url"
   (before
@@ -103,16 +99,15 @@
     (should=
       (str (response/make 401) "Authentication required")
       (socket/connect
-        {:method "GET"
-         :uri "/logs"
-         :version "HTTP/1.1"})))
+        {:method "GET" :uri "/logs" :version "HTTP/1.1"})))
 
   (it "should contain the logs otherwise"
     (should=
-      (str (response/make 200) "GET /logs HTTP/1.1\r\n")
-      (socket/connect
-        {:method "GET"
-         :uri "/logs"
-         :version "HTTP/1.1"
-         :Authorization cob-app.get/AUTHORIZATION}))))
+      (str (response/make 200) "GET / HTTP/1.1\r\n")
+      (do
+       (socket/connect
+          {:method "GET" :uri "/" :version "HTTP/1.1"})
+       (socket/connect
+          {:method "GET" :uri "/logs" :version "HTTP/1.1"
+           :Authorization cob-app.get/AUTHORIZATION})))))
 

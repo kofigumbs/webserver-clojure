@@ -1,11 +1,11 @@
 (ns webserver.core
-  (:require [webserver.app :as app])
-  (:require [cob-app.core])
-  (:require [cob-app.get])
-  (:require [cob-app.upload])
-  (:require [cob-app.delete])
-  (:require [cob-app.options])
-  (:gen-class))
+  (:gen-class)
+  (:require [webserver.app :as app]
+            [cob-app.core]
+            [cob-app.get]
+            [cob-app.upload]
+            [cob-app.delete]
+            [cob-app.options]))
 
 (def DEFAULT_PORT 5000)
 

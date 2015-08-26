@@ -23,9 +23,7 @@
       (should=
         (response/make 200)
         (socket/connect
-          {:method method
-           :uri "/foo.bar"
-           :version "HTTP/1.1"
+          {:method method :uri "/foo.bar" :version "HTTP/1.1"
            :Content-Length "51"
            :Content-Type "text/plain"}
           @body))
@@ -69,18 +67,14 @@
     (should=
       (response/make 412)
       (socket/connect
-        {:method "PATCH"
-         :uri "/foo.bar"
-         :version "HTTP/1.1"
+        {:method "PATCH" :uri "/foo.bar" :version "HTTP/1.1"
          :If-Match "123456789abcdefghijklm"})))
 
   (it "204s and updates with proper ETag"
     (should=
       (response/make 204)
       (socket/connect
-        {:method "PATCH"
-         :uri "/foo.bar"
-         :version "HTTP/1.1"
+        {:method "PATCH" :uri "/foo.bar" :version "HTTP/1.1"
          :If-Match "8843d7f92416211de9ebb963ff4ce28125932878"}
         "barfoo"))
     (should= (slurp "./tmp/foo.bar") "barfoo"))

@@ -1,6 +1,7 @@
 (ns cob-app.core
   (:require [webserver.response :as response]
-            [webserver.app :as app]))
+            [webserver.app :as app]
+            [clojure.java.io :as io]))
 
 (def DEFAULT_DIR "./tmp/")
 (def DIR (atom DEFAULT_DIR))
@@ -40,8 +41,7 @@
   (route request input-stream))
 
 (defmethod app/handle true [socket request]
-  (let [_ (update-log request)
-        response (pre-route request (.getInputStream socket))
-        output-stream (.getOutputStream socket)]
-    (doall (for [r response] (clojure.java.io/copy r output-stream)))))
+  (let [response (pre-route request (.getInputStream socket))]
+    (update-log request)
+    (doall (for [r response] (io/copy r (.getOutputStream socket))))))
 
