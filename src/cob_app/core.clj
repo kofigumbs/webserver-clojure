@@ -16,7 +16,6 @@
 (defn- initialize [args]
   (reset! DIR (ensure-trailing-slash (extract-dir args))))
 
-
 (defn- dispatch-route [request _] (:method request))
 (defmulti route dispatch-route)
 (defmethod route :default [request input-stream] [(response/make 501)])

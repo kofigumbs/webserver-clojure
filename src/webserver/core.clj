@@ -11,14 +11,21 @@
 
 (defn extract-port [args]
   (try
-    (Integer. (second (drop-while #(not= "-p" %) args)))
+    (Integer. ^String (second (drop-while #(not= "-p" %) args)))
     (catch Exception _ DEFAULT_PORT)))
+
+(defn process-request [^java.net.ServerSocket server
+                       ^java.util.concurrent.ExecutorService pool
+                       valid-request-handler]
+  (let [socket (.accept server)]
+    (.submit pool ^Runnable #(app/relay valid-request-handler socket))))
 
 (defn -main [& args]
   (let [server (java.net.ServerSocket. (extract-port args))
         pool (java.util.concurrent.Executors/newSingleThreadExecutor)
-        _ (app/initialize backing-app/responder args)
-        _ (println "Serving HTTP...")]
-    (while true (let [socket (.accept server)]
-                  (.submit pool (cast Runnable #(app/relay socket)))))))
+        {:keys [initializer valid-request-handler]} backing-app/responder]
+    (initializer args)
+    (println "Serving HTTP...")
+    (while (not (.isClosed server))
+      (process-request server pool valid-request-handler))))
 

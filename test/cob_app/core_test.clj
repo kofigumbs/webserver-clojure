@@ -1,19 +1,20 @@
 (ns cob-app.core-test
   (:require [speclj.core :refer :all]
             [cob-app.core :as core]
-            [webserver.app :as app]
+            [webserver.core :as app]
             [webserver.response :as response]
             [cob-app.mock-socket :as socket]))
 
 (describe "Set directory dir"
+  (with initializer (:initializer core/responder))
   (it "properly sets public string"
-    (app/initialize core/responder [])
+    (@initializer [])
     (should= @core/DIR core/DEFAULT_DIR)
-    (app/initialize core/responder ["-d" "tmp"])
+    (@initializer ["-d" "tmp"])
     (should= @core/DIR "tmp/")
-    (app/initialize core/responder ["-d" "dir/"])
+    (@initializer ["-d" "dir/"])
     (should= @core/DIR "dir/")
-    (app/initialize core/responder [])))
+    (@initializer [])))
 
 (describe "Default response"
   (it "501s on nonsense request"
