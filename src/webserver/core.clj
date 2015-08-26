@@ -17,7 +17,7 @@
 (defn -main [& args]
   (let [server (java.net.ServerSocket. (extract-port args))
         pool (java.util.concurrent.Executors/newSingleThreadExecutor)
-        _ (app/initialize backing-app/protocol args)
+        _ (app/initialize backing-app/responder args)
         _ (println "Serving HTTP...")]
     (while true (let [socket (.accept server)]
                   (.submit pool (cast Runnable #(app/relay socket)))))))

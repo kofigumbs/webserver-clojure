@@ -10,11 +10,11 @@
 (defn- extract-dir [args]
   (#(if % % DEFAULT_DIR) (second (drop-while (partial not= "-d") args))))
 
-(defn- add-trailing-slash [dir]
+(defn- ensure-trailing-slash [dir]
   (str dir (if-not (.endsWith dir "/") "/")))
 
 (defn- initialize [args]
-  (reset! DIR (add-trailing-slash (extract-dir args))))
+  (reset! DIR (ensure-trailing-slash (extract-dir args))))
 
 
 (defn- dispatch-route [request _] (:method request))
@@ -34,5 +34,5 @@
     (update-log request)
     (doall (for [r response] (io/copy r (.getOutputStream socket))))))
 
-(def protocol {:valid-request-handler handle :initializer initialize})
+(def responder {:valid-request-handler handle :initializer initialize})
 

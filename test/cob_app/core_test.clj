@@ -7,13 +7,13 @@
 
 (describe "Set directory dir"
   (it "properly sets public string"
-    (app/initialize core/protocol [])
+    (app/initialize core/responder [])
     (should= @core/DIR core/DEFAULT_DIR)
-    (app/initialize core/protocol ["-d" "tmp"])
+    (app/initialize core/responder ["-d" "tmp"])
     (should= @core/DIR "tmp/")
-    (app/initialize core/protocol ["-d" "dir/"])
+    (app/initialize core/responder ["-d" "dir/"])
     (should= @core/DIR "dir/")
-    (app/initialize core/protocol [])))
+    (app/initialize core/responder [])))
 
 (describe "Default response"
   (it "501s on nonsense request"

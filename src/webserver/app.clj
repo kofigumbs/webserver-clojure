@@ -3,11 +3,11 @@
             [webserver.headers :as headers]
             [clojure.java.io :as io]))
 
-(def protocol (atom {}))
+(def responder (atom {}))
 
-(defn initialize [backing-protocol args]
-  (reset! protocol backing-protocol)
-  ((:initializer @protocol) args))
+(defn initialize [backing-responder args]
+  (reset! responder backing-responder)
+  ((:initializer @responder) args))
 
 
 (defn- write-400 [socket]
@@ -19,6 +19,6 @@
     (write-400 socket)))
 
 (defn relay [socket]
-  (respond (:valid-request-handler @protocol) (headers/extract socket) socket)
+  (respond (:valid-request-handler @responder) (headers/extract socket) socket)
   (.close socket))
 
