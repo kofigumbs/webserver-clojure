@@ -20,11 +20,15 @@
 
 (defn- extract-bytes [field]
   (let [[_ start end] (re-find #"^bytes=(\d+)?-(\d+)?$" field)]
-    (map #(try (Integer. ^String %) (catch Exception _ 0)) [start end])))
+    (map #(try (Integer. ^String %) (catch Exception _ nil)) [start end])))
 
 (defn- parse-range [file file-range]
   (let [[start end] (extract-bytes (str file-range))]
-    [start  (- (if (> end start) (inc end) (.length file)) start)]))
+    (cond
+      (and start (not end)) [start (- (.length file) start)]
+      (and (not start) end) [(- (.length file) end) end]
+      (and start end) [start (inc (- end start))]
+      :default [0 (.length file)])))
 
 (defn- read-file [file file-range]
   (let [[start length] (parse-range file file-range)

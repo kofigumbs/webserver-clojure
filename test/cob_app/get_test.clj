@@ -120,7 +120,11 @@
     (io/delete-file "./tmp/file")
     (io/delete-file "./tmp"))
 
-  (for [[range-field contents] [["bytes=0-2" "foo"] ["bytes=4-5" "ar"]]]
+  (for [[range-field contents]
+        [["bytes=0-2" "foo"]
+         ["bytes=4-5" "ar"]
+         ["bytes=1-" "oobar"]
+         ["bytes=-1" "r"]]]
     (it (str "reads " range-field " from file")
      (should=
        (str
