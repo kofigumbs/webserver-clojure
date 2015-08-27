@@ -2,7 +2,7 @@
   (:require [speclj.core :refer :all]
             [cob-app.get]
             [cob-app.core :as core]
-            [webserver.mock-socket :as socket]
+            [cob-app.mock-socket :as socket]
             [webserver.response :as response]
             [clojure.java.io :as io]
             [clojure.data.codec.base64 :as b64]))
@@ -31,7 +31,6 @@
           {:Content-Type "application/octet-stream"})
         "foobar")
       (socket/connect
-        core/handle
         {:method "GET" :uri "/file" :version "HTTP/1.1"})))
 
   (it "gets mock folder"
@@ -47,19 +46,16 @@
         "</body>"
         "</html>")
       (socket/connect
-        core/handle
         {:method "GET" :uri "/" :version "HTTP/1.1"})))
 
   (it "404s on non-existent file"
     (should= (response/make 404)
              (socket/connect
-               core/handle
                {:method "GET" :uri "/none" :version "HTTP/1.1"})))
 
   (it "404s on non-existent image"
     (should= (response/make 404)
              (socket/connect
-               core/handle
                {:method "GET" :uri "/none.gif" :version "HTTP/1.1"})))
 
   (it "responds with image file and headers"
@@ -68,7 +64,6 @@
         (response/make 200 {:Content-Type "image/gif"})
         (slurp "./tmp/image.gif"))
       (socket/connect
-        core/handle
         {:method "GET" :uri "/image.gif" :version "HTTP/1.1"}))))
 
 (describe "Redirect url"
@@ -76,10 +71,7 @@
     (should=
       (response/make 302 {:Location "http://localhost:5000/"})
       (socket/connect
-        core/handle
-        {:method "GET"
-         :uri "/redirect"
-         :version "HTTP/1.1"
+        {:method "GET" :uri "/redirect" :version "HTTP/1.1"
          :Host "localhost:5000"}))))
 
 (describe "Parameter url"
@@ -87,7 +79,6 @@
     (should=
       (str (response/make 200) "variable_1 = <,")
       (socket/connect
-        core/handle
         {:method "GET"
          :uri "/parameters"
          :parameters "variable_1=%3C%2C"
@@ -97,11 +88,8 @@
     (should=
       (str (response/make 200) "x = <,\r\ny = *?\r\nz = hello")
       (socket/connect
-        core/handle
-        {:method "GET"
-         :uri "/parameters"
-         :parameters "x=%3C%2C&y=%2A%3F&z=hello"
-         :version "HTTP/1.1"}))))
+        {:method "GET" :uri "/parameters" :version "HTTP/1.1"
+         :parameters "x=%3C%2C&y=%2A%3F&z=hello"}))))
 
 (describe "Logs url"
   (before
@@ -111,18 +99,15 @@
     (should=
       (str (response/make 401) "Authentication required")
       (socket/connect
-        core/handle
-        {:method "GET"
-         :uri "/logs"
-         :version "HTTP/1.1"})))
+        {:method "GET" :uri "/logs" :version "HTTP/1.1"})))
 
   (it "should contain the logs otherwise"
     (should=
-      (str (response/make 200) "GET /logs HTTP/1.1\r\n")
-      (socket/connect
-        core/handle
-        {:method "GET"
-         :uri "/logs"
-         :version "HTTP/1.1"
-         :Authorization cob-app.get/AUTHORIZATION}))))
+      (str (response/make 200) "GET / HTTP/1.1\r\n")
+      (do
+       (socket/connect
+          {:method "GET" :uri "/" :version "HTTP/1.1"})
+       (socket/connect
+          {:method "GET" :uri "/logs" :version "HTTP/1.1"
+           :Authorization cob-app.get/AUTHORIZATION})))))
 

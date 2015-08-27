@@ -5,6 +5,8 @@
             [pandect.algo.sha1 :refer [sha1]]))
 
 (def METHOD_NOT_ALLOWED [(response/make 405)])
+(defmethod core/pre-route ["PUT" "/file1"] [_ _] METHOD_NOT_ALLOWED)
+(defmethod core/pre-route ["POST" "/text-file.txt"] [_ _] METHOD_NOT_ALLOWED)
 
 (defn- write-file [input-stream output-file length]
   (let [contents (byte-array length)]
@@ -30,12 +32,6 @@
 (defn- patch [request input-stream]
   (upload request input-stream)
   (response/make 204))
-
-(defmethod core/pre-route ["PUT" "/file1"] [_ _]
-  METHOD_NOT_ALLOWED)
-
-(defmethod core/pre-route ["POST" "/text-file.txt"] [_ _]
-  METHOD_NOT_ALLOWED)
 
 (defmethod core/route "PUT" [request input-stream]
   (upload request input-stream))

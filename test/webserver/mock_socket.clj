@@ -1,4 +1,5 @@
-(ns webserver.mock-socket)
+(ns webserver.mock-socket
+  (:require [webserver.app :as app]))
 
 (defn make [input]
   (let [ouput-stream (java.io.ByteArrayOutputStream.)]
@@ -6,12 +7,4 @@
       []
       (getInputStream [] (java.io.ByteArrayInputStream. (.getBytes input)))
       (getOutputStream [] ouput-stream))))
-
-(defn connect
-  ([handler request]
-   (connect handler request ""))
-  ([handler request body]
-   (let [socket (make body)]
-     (do (handler request socket)
-         (str (.getOutputStream socket))))))
 
