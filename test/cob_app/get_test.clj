@@ -19,9 +19,9 @@
     (.delete (io/file "./tmp/base64_image")))
 
   (after-all
-    (.delete (io/file "./tmp/file"))
-    (.delete (io/file "./tmp/image.gif"))
-    (.delete (io/file "./tmp")))
+    (io/delete-file "./tmp/file")
+    (io/delete-file "./tmp/image.gif")
+    (io/delete-file "./tmp"))
 
   (it "gets mock file"
     (should=
@@ -110,4 +110,23 @@
        (socket/connect
           {:method "GET" :uri "/logs" :version "HTTP/1.1"
            :Authorization cob-app.get/AUTHORIZATION})))))
+
+(describe "Partial content requests"
+  (before-all
+    (.mkdir (io/file "./tmp"))
+    (spit "./tmp/file" "foobar"))
+
+  (after-all
+    (io/delete-file "./tmp/file")
+    (io/delete-file "./tmp"))
+
+  (for [[range-field contents] [["bytes=0-2" "foo"] ["bytes=4-5" "ar"]]]
+    (it (str "reads " range-field " from file")
+     (should=
+       (str
+         (response/make 206 {:Content-Type "application/octet-stream"})
+         contents)
+       (socket/connect
+         {:method "GET" :uri "/file" :version "HTTP/1.1"
+          :Range range-field})))))
 
