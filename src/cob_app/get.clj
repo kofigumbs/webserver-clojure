@@ -10,15 +10,39 @@
 (defn- not-found []
   [(response/make 404)])
 
-(defn- get-image-extension [file]
-  (second (re-find IMAGE_EXTENSION (.getName file))))
+(defn- get-image-type [file]
+  (#(if % (str "image/" %))
+        (second (re-find IMAGE_EXTENSION (.getName file)))))
 
-(defn- request-image [file]
+(defn- get-content-type [file]
+  (first
+    (keep identity [(get-image-type file) "application/octet-stream"])))
+
+(defn- extract-bytes [field]
+  (let [[_ start end] (re-find #"^bytes=(\d+)?-(\d+)?$" field)]
+    (map #(try (Integer. ^String %) (catch Exception _ nil)) [start end])))
+
+(defn- parse-range [file file-range]
+  (let [[start end] (extract-bytes (str file-range))]
+    (cond
+      (and start (not end)) [start (- (.length file) start)]
+      (and (not start) end) [(- (.length file) end) end]
+      (and start end) [start (inc (- end start))]
+      :default [0 (.length file)])))
+
+(defn- read-file [file file-range]
+  (let [[start length] (parse-range file file-range)
+        output (byte-array length)
+        file-input-stream (java.io.FileInputStream. file)]
+    (.skip file-input-stream start)
+    (.read file-input-stream output)
+    output))
+
+(defn- request-file [file file-range]
   [(response/make
-     200
-     {:Content-Type
-      (str "image/" (get-image-extension file))})
-   file])
+     (if file-range 206 200)
+     {:Content-Type (get-content-type file)})
+   (read-file file file-range)])
 
 (defn- request-directory [folder]
   (concat
@@ -27,16 +51,11 @@
     (map #(format "<a href=\"/%s\">%s</a>" % %) (.list folder))
     ["</body></html>"]))
 
-(defn- request-octet-stream [file]
-  [(response/make 200 {:Content-Type "application/octet-stream"})
-   file])
-
-(defn- respond [file request]
+(defn- respond [file file-range]
   (cond
     (not (.exists file)) (not-found)
-    (re-find IMAGE_EXTENSION (.getName file)) (request-image file)
     (.isDirectory file) (request-directory file)
-    :default (request-octet-stream file)))
+    :default (request-file file file-range)))
 
 (defmethod core/pre-route ["GET" "/redirect"] [{host :Host} _]
   [(response/make 302 {:Location (format "http://%s/" host)})])
@@ -57,5 +76,5 @@
 (defmethod core/route "GET" [request _]
   (respond
     (clojure.java.io/file (str @core/DIR (:uri request)))
-    request))
+    (:Range request)))
 

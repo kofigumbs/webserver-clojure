@@ -5,6 +5,7 @@
 (def NAMES
   {200 "OK"
    204 "No Content"
+   206 "Partial Content"
    302 "Found"
    400 "Bad Request"
    401 "Authorization Required"
