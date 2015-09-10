@@ -1,4 +1,4 @@
-(defproject webserver "0.1.0-SNAPSHOT"
+(defproject webserver "0.1.1-SNAPSHOT"
   :description "Server that complies with github.com/8thlight/cob_spec"
   :dependencies [[org.clojure/clojure "1.7.0"]
                  [org.clojure/data.codec "0.1.0"]
