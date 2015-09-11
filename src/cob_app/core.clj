@@ -1,37 +1,24 @@
 (ns cob-app.core
   (:require [webserver.response :as response]
+            [webserver.util :as util]
             [clojure.java.io :as io]))
 
-(def LOG (atom []))
+(def log (atom []))
 
 (def DEFAULT_DIR "./tmp/")
 (def DIR (atom DEFAULT_DIR))
 
-(defn- extract-dir [args]
-  (#(if % % DEFAULT_DIR) (second (drop-while (partial not= "-d") args))))
-
-(defn- ensure-trailing-slash [dir]
-  (str dir (if-not (.endsWith dir "/") "/")))
-
-(defn- initialize [args]
-  (reset! DIR (ensure-trailing-slash (extract-dir args))))
-
-(defn- dispatch-route [request _] (:method request))
+(defn- dispatch-route [request _] [(:method request) (:uri request)])
 (defmulti route dispatch-route)
-(defmethod route :default [request input-stream] [(response/make 501)])
+(defmethod route :default [_ _])
 
-(defn- dispatch-pre-route [request _] [(:method request) (:uri request)])
-(defmulti pre-route dispatch-pre-route)
-(defmethod pre-route :default [request input-stream]
-  (route request input-stream))
-
+(defn get-log [] @log)
 (defn- update-log [{method :method uri :uri version :version}]
-  (swap! LOG conj (format "%s %s %s\r\n" method uri version)))
+  (swap! log conj (format "%s %s %s\r\n" method uri version)))
+(defn- write [output socket]
+  (doseq [o output] (io/copy o (.getOutputStream socket))))
 
-(defn- handle [socket request]
-  (let [response (pre-route request (.getInputStream socket))]
-    (update-log request)
-    (doall (for [r response] (io/copy r (.getOutputStream socket))))))
-
-(def responder {:valid-request-handler handle :initializer initialize})
-
+(defn handle [socket request]
+  (update-log request)
+  (if-let [result (route request (.getInputStream socket))]
+    (do (write result socket) true)))

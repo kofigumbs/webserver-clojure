@@ -1,19 +1,19 @@
-(ns webserver.core-test
+(ns webserver.servlet-test
   (:require [speclj.core :refer :all]
-            [webserver.core :as core]
+            [webserver.servlet :as servlet]
             [webserver.mock-socket :as socket]
             [clojure.java.io :as io]))
 
 (def stub-handler-response "Hello world!\r\n")
 (defn stub-handler [socket _]
-  (io/copy stub-handler-response (.getOutputStream socket)))
+  (io/copy stub-handler-response (.getOutputStream socket)) true)
 
 (describe "Command line argument"
   (it "assigns correct port"
-    (should= 80 (core/extract-port ["-p" "80"]))
-    (should= 8080 (core/extract-port ["-p" "8080"]))
-    (should= core/DEFAULT_PORT (core/extract-port ["-p" "asdf"]))
-    (should= core/DEFAULT_PORT (core/extract-port []))))
+    (should= 80 (servlet/get-port ["-p" "80"]))
+    (should= 8080 (servlet/get-port ["-p" "8080"]))
+    (should= servlet/default-port (servlet/get-port ["-p" "asdf"]))
+    (should= servlet/default-port (servlet/get-port []))))
 
 (describe "Request processing"
   (with socket (socket/make "HEAD / HTTP/1.1\r\n\r\n"))
@@ -24,7 +24,6 @@
 
   (it "accepts from ServerSocket and submits to ExecutorService"
     (should= stub-handler-response
-             (do (core/process-request
+             (do (servlet/process-request
                    @stub-server @stub-pool stub-handler)
                  (str (.getOutputStream @socket))))))
-
